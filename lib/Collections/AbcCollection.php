@@ -10,7 +10,7 @@ use Countable,
     Python\PClass,
     Throwable;
 
-abstract class AbcCollection extends PClass implements Countable, IteratorAggregate, JsonSerializable
+abstract class AbcCollection extends PClass implements \ArrayAccess, Countable, IteratorAggregate, JsonSerializable
 {
 
     use AbcSized,
