@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-use InvalidArgumentException,
-    Throwable,
-    TypeError;
-use function array_is_list,
-             get_debug_type,
-             is_arrayaccess;
-
 if ( ! function_exists('is_list'))
 {
 

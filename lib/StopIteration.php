@@ -7,9 +7,9 @@ namespace Python;
 class StopIteration extends \Exception
 {
 
-    public function __construct(string $message = "Iteration has stopped", int $code = 0, ?\Throwable $previous = null): \Exception
+    public function __construct(string $message = "Iteration has stopped", int $code = 0, ?\Throwable $previous = null)
     {
-        return parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
 
 }
