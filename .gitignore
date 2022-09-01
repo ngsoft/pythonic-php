@@ -1,0 +1,8 @@
+.*
+!.env.*
+!.git*
+!.phan
+!.ht*
+*.lock
+/nbproject/private/
+/vendor/
