@@ -23,7 +23,7 @@
             "NGSOFT\\": "src/",
             "py\\": "lib/"
         },
-        "files": []
+        "files": ["lib/bootstrap.php"]
     },
     "minimum-stability": "dev",
     "prefer-stable": true
