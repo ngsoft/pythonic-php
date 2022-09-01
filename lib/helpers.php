@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-use NGSOFT\{
-    Tools, Tools\TypeCheck
-};
-
 /**
  * From ngsoft/tools ^3
  */
@@ -180,92 +176,6 @@ if ( ! function_exists('is_instanciable'))
 
 }
 
-
-if ( ! function_exists('preg_valid'))
-{
-
-    /**
-     * Check if regular expression is valid
-     *
-     * @phan-suppress PhanParamSuspiciousOrder
-     */
-    function preg_valid(string $pattern, bool $exception = false): bool
-    {
-        try
-        {
-            set_default_error_handler();
-            return $pattern !== ltrim($pattern, '%#/') && preg_match($pattern, '') !== false; // must be >=0 to be correct
-        } catch (ErrorException $error)
-        {
-            if ($exception)
-            {
-                $msg = str_replace('_match', '_valid', $error->getMessage());
-                throw new WarningException($msg, previous: $error);
-            }
-            return false;
-        } finally
-        { restore_error_handler(); }
-    }
-
-}
-
-if ( ! function_exists('preg_test'))
-{
-
-    /**
-     * Test if subject matches the pattern
-     */
-    function preg_test(string $pattern, string $subject): bool
-    {
-        preg_valid($pattern, true);
-        return preg_match($pattern, $subject) > 0;
-    }
-
-}
-
-if ( ! function_exists('preg_exec'))
-{
-
-    /**
-     * Perform a regular expression match
-     *
-     * @param string $pattern the regular expression
-     * @param string $subject the subject
-     * @param int $limit maximum number of results if set to 0, all results are returned
-     * @return array
-     */
-    function preg_exec(string $pattern, string $subject, int $limit = 1): array
-    {
-        preg_valid($pattern, true);
-
-        $limit = max(0, $limit);
-
-        if (preg_match_all($pattern, $subject, $matches, PREG_SET_ORDER) > 0)
-        {
-
-
-            if ($limit === 0)
-            {
-                $limit = count($matches);
-            }
-
-            if ($limit === 1)
-            {
-                return $matches[0];
-            }
-
-            while (count($matches) > $limit)
-            {
-                array_pop($matches);
-            }
-            return $matches;
-        }
-
-        return [];
-    }
-
-}
-
 if ( ! function_exists('in_range'))
 {
 
@@ -319,50 +229,13 @@ if ( ! function_exists('length'))
             case 'bool':
                 return $value ? 1 : 0;
             case 'int':
-                return $value;
             case 'float':
-                return (int) $value;
+                return $value > 0 ? (int) $value : 0;
             case 'string':
                 return $value === '' ? 0 : mb_strlen($value);
         }
 
         return count($value);
-    }
-
-}
-
-
-if ( ! function_exists('require_package'))
-{
-
-
-    /**
-     * Helper to define an optionnal composer required package
-     *
-     * @link https://getcomposer.org/doc/04-schema.md#json-schema
-     *
-     * @param string $package Composer package name with version eg: ngsoft/tools:^3
-     * @param string $classCheck A class/interface/trait present in the package to check if exists
-     * @param string $exceptionClass the exception class to throw if not present
-     * @return void
-     * @throws InvalidArgumentException if package name is incorrect
-     */
-    function require_package(string $package, string $classCheck, string $exceptionClass = RuntimeException::class): void
-    {
-
-        list($name) = explode(':', $package);
-
-        if (preg_match('#^[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9](([_.]?|-{0,2})[a-z0-9]+)*$#', $name) === false)
-        {
-            throw new InvalidArgumentException("Invalid package name: {$name}");
-        }
-
-        if ( ! class_exists($classCheck) && ! interface_exists($classCheck) && ! trait_exists($classCheck))
-        {
-            throw new $exceptionClass(
-                            sprintf('Composer package %s not installed, please run: composer require %s', $name, $package)
-            );
-        }
     }
 
 }
