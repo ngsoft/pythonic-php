@@ -4,5 +4,5 @@
 !.phan
 !.ht*
 *.lock
-/nbproject/private/
+/nbproject/*/
 /vendor/
