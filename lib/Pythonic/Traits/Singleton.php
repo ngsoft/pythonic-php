@@ -62,7 +62,7 @@ trait Singleton
             return $reflector->invokeArgs($self, $arguments);
         } catch (ReflectionException $prev)
         {
-            NotImplementedError::raise('%s::%s() is not implemented.', static::class, $method, previous: $prev);
+            return NotImplementedError::raise('%s::%s() is not implemented.', static::class, $method, previous: $prev);
         }
     }
 
