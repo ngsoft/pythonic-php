@@ -14,8 +14,8 @@ use ReflectionClass,
 class Importer
 {
 
-    use Singleton,
-        NotInstanciable;
+    use NotInstanciable,
+        Singleton;
 
     protected static $_aliases = [];
 
@@ -56,26 +56,42 @@ class Importer
         static::$_aliases[self::convertToPythonic($to)] = self::convertToPythonic($from);
     }
 
-    protected function getAlias(string $namespace): string
+    protected static function getAlias(string $namespace): string
     {
-        return isset(static::$_aliases[$namespace]) ? $this->getAlias(static::$_aliases[$namespace]) : $namespace;
+        return isset(static::$_aliases[$namespace]) ? static::getAlias(static::$_aliases[$namespace]) : $namespace;
     }
 
     /**
-     * Replaces the ptyhon from keyword
+     * Replaces the python from keyword
      * usage $resource = from('namespace.subnamespace')->import('name')
-     *
      */
-    public function from(string $namespace): static
+    public static function from(string $namespace): static
     {
-        $this->from = $this->getAlias($namespace);
+        return static::instance()->_from($namespace);
+    }
+
+    /**
+     * Replaces the python from keyword
+     * usage $resource = from('namespace.subnamespace')->import('name')
+     */
+    protected function _from(string $namespace): static
+    {
+        $this->from = static::getAlias($namespace);
         return $this;
     }
 
     /**
-     *
+     * imports a resource that can be a function name or class name
      */
-    public function import(string $resource): mixed
+    public static function import(string $resource): string
+    {
+        return static::instance()->_import($resource);
+    }
+
+    /**
+     * imports a resource that can be a function name or class name
+     */
+    protected function _import(string $resource): string
     {
 
 
@@ -100,9 +116,11 @@ class Importer
 
                 if (function_exists($php))
                 {
+                    // get the cased name and caches the result
                     return static::$_cache[$resource] = (new ReflectionFunction($php))->getName();
                 } elseif (class_exists($php))
                 {
+                    // get the cased name and caches the result
                     return static::$_cache[$resource] = (new ReflectionClass($php))->getName();
                 }
             }
