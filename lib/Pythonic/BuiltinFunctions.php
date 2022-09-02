@@ -7,13 +7,18 @@ namespace Pythonic;
 /**
  * Pythonic Builtin functions
  */
-class BuiltinFunctions
+class BuiltinFunctions implements Types\BootAble
 {
 
+    use Traits\NotInstanciable;
+
+    protected static $__slots__ = [];
+    protected static $__all__ = [];
+
     /**
-     * Cannot be instanciated directly
+     * Loads Builtin functions into memory
      */
-    private function __construct()
+    public static function __boot__(): void
     {
 
     }
