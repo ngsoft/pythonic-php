@@ -72,8 +72,8 @@ trait Singleton
      */
     public static function __callStatic(string $name, array $arguments): mixed
     {
-
-        return static::executeMethod(static::instance(), $name, $arguments);
+        // call $class::__method__ as $class::instance()->method()
+        return static::executeMethod(static::instance(), preg_replace('#^_{2}(.+)_{2}$#', '$1', $name), $arguments);
     }
 
 }

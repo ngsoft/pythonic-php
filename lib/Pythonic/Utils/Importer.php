@@ -4,13 +4,31 @@ declare(strict_types=1);
 
 namespace Pythonic\Utils;
 
-use Pythonic\Errors\ImportError,
-    ReflectionException;
+use Pythonic\{
+    Errors\ImportError, Traits\NotInstanciable, Traits\Singleton
+};
+use ReflectionClass,
+    ReflectionException,
+    ReflectionFunction;
 
 class Importer
 {
 
+    use Singleton,
+        NotInstanciable;
+
     protected static $_aliases = [];
+
+    /**
+     * Mapped previous results
+     * @var array<string, string>
+     */
+    protected static array $_cache = [];
+
+    /**
+     * Prefix to import
+     * @var string|null
+     */
     protected ?string $from = null;
 
     protected static function convertToPythonic(string $namespace): string
@@ -54,6 +72,9 @@ class Importer
         return $this;
     }
 
+    /**
+     *
+     */
     public function import(string $resource): mixed
     {
 
@@ -65,14 +86,25 @@ class Importer
                 $resource = $this->from . ".$resource";
             }
 
-            $php = static::convertToPhp($resource);
+            if (isset(static::$_cache[$resource]))
+            {
+                return static::$_cache[$resource];
+            }
 
-            if (function_exists($php))
+            /**
+             * loads pythonic modules without using 'pythonic' namespace
+             */
+            foreach (['', 'pythonic.'] as $prefix)
             {
-                return (new \ReflectionFunction($php))->getName();
-            } elseif (class_exists($resource))
-            {
-                return (new \ReflectionClass($php))->getName();
+                $php = static::convertToPhp($prefix . $resource);
+
+                if (function_exists($php))
+                {
+                    return static::$_cache[$resource] = (new ReflectionFunction($php))->getName();
+                } elseif (class_exists($php))
+                {
+                    return static::$_cache[$resource] = (new ReflectionClass($php))->getName();
+                }
             }
         } catch (ReflectionException)
         {

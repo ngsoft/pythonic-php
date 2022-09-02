@@ -2,12 +2,38 @@
 
 declare(strict_types=1);
 
-use Pythonic\Traits\Singleton;
+use Pythonic\Utils\Importer;
 
 $__all__ = [];
 
-require_once __DIR__ . '/Pythonic/builtin.php';
+if ( ! function_exists('import'))
+{
 
-var_dump((new ReflectionClass(\pythonic\builtinfunctions::class))->getName());
+    function import(string $resource): mixed
+    {
+        return Importer::__import__($resource);
+    }
 
-var_dump((new ReflectionFunction('pythonic\\t'))->getName());
+}
+
+
+if ( ! function_exists('from'))
+{
+
+    function from(string $namespace): Importer
+    {
+        return Importer::__from__($namespace);
+    }
+
+}
+
+
+
+
+
+
+from('utils'); $importer = import('importer');
+
+var_dump($importer);
+
+var_dump($importer::instance());
