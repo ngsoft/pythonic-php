@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Pythonic\Traits;
 
-use Pythonic\Errors\RuntimeException;
+use Pythonic\Errors\{
+    NotImplementedError, RuntimeError
+};
+use ReflectionException,
+    ReflectionMethod;
 
 /**
  * Use Singleton/Facade antipattern to call instances methods statically
@@ -33,10 +37,9 @@ trait Singleton
     protected static function __instanciate__(): object
     {
 
-        $class = self::$__class__ ??= static::class;
-        if (trait_exists($class))
+        if (trait_exists($class = self::$__class__ ??= static::class) || interface_exists($class))
         {
-            RuntimeException::raise('Cannot instanciate trait %s.', $class);
+            RuntimeError::raise('Cannot instanciate %s.', $class);
         }
         return new $class();
     }
@@ -47,6 +50,26 @@ trait Singleton
     public static function instance(): object
     {
         return self::$__instance__ ??= self::__instanciate__();
+    }
+
+    protected static function executeMethod(object $self, string $method, array $arguments): mixed
+    {
+
+        try
+        {
+            $reflector = new ReflectionMethod($self, $method);
+
+            return $reflector->invokeArgs($self, $arguments);
+        } catch (ReflectionException $prev)
+        {
+            NotImplementedError::raise('%s::%s() is not implemented.', static::class, $method, previous: $prev);
+        }
+    }
+
+    public static function __callStatic(string $name, array $arguments): mixed
+    {
+
+        return static::executeMethod(static::instance(), $name, $arguments);
     }
 
 }

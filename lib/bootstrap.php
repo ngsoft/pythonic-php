@@ -6,4 +6,4 @@ use Pythonic\Traits\Singleton;
 
 $__all__ = [];
 
-\Pythonic\BuiltinFunctions::__boot__();
+\Pythonic\BuiltinFunctions::boot();

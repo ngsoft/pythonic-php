@@ -7,7 +7,7 @@ namespace Pythonic;
 /**
  * Pythonic Builtin functions
  */
-class BuiltinFunctions implements Types\BootAble
+final class BuiltinFunctions implements Types\BootAble
 {
 
     use Traits\NotInstanciable,
@@ -15,6 +15,7 @@ class BuiltinFunctions implements Types\BootAble
 
     protected static $__slots__ = [];
     protected static $__all__ = [];
+    protected static bool $__booted__ = false;
 
     /**
      * Loads Builtin functions into memory
@@ -22,8 +23,19 @@ class BuiltinFunctions implements Types\BootAble
     public static function __boot__(): void
     {
 
+        if (self::$__booted__)
+        {
+            return;
+        }
 
-        var_dump(self::instance());
+        self::$__booted__ = true;
+
+        $instance = self::instance();
+
+        foreach (self::$__all__ as $method)
+        {
+
+        }
     }
 
 }
