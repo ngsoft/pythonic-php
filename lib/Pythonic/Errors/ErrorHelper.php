@@ -28,10 +28,6 @@ trait ErrorHelper
     public function raise(string $message, mixed ...$values): never
     {
 
-        if (trait_exists(__CLASS__))
-        {
-
-        }
 
         throw new static(static::vprintf($message));
     }

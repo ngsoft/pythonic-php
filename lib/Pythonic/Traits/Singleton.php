@@ -34,11 +34,6 @@ trait Singleton
 
         $class = self::$__class__ ??= static::class;
 
-        if (trait_exists($class))
-        {
-            throw new RuntimeException(sprintf('%s cannot be called statically', $class));
-        }
-
         return new $class();
     }
 
