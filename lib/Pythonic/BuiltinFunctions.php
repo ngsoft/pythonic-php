@@ -7,7 +7,7 @@ namespace Pythonic;
 /**
  * Pythonic Builtin functions
  */
-class BuiltinFunctions implements BootAble
+class BuiltinFunctions
 {
 
     /**
