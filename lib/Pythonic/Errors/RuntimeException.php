@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pythonic\Errors;
 
-class Error extends \Error implements PythonicError
+class RuntimeException extends \RuntimeException implements PythonicError
 {
 
     use ErrorHelper;

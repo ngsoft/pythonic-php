@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Pythonic\Errors;
 
-class ValueError extends Error
+class ValueError extends \ValueError implements PythonicError
 {
 
+    use ErrorHelper;
 }

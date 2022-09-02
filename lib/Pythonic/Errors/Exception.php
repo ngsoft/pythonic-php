@@ -7,4 +7,5 @@ namespace Pythonic\Errors;
 class Exception extends \Exception implements PythonicError
 {
 
+    use ErrorHelper;
 }

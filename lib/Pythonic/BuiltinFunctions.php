@@ -10,7 +10,8 @@ namespace Pythonic;
 class BuiltinFunctions implements Types\BootAble
 {
 
-    use Traits\NotInstanciable;
+    use Traits\NotInstanciable,
+        Traits\Singleton;
 
     protected static $__slots__ = [];
     protected static $__all__ = [];
@@ -21,6 +22,8 @@ class BuiltinFunctions implements Types\BootAble
     public static function __boot__(): void
     {
 
+
+        var_dump(self::instance());
     }
 
 }
