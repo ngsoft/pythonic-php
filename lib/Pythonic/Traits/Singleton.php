@@ -33,11 +33,14 @@ trait Singleton
      * Instanciate the unique instance
      * Override this to add arguments if needed
      *
+     * @phan-suppress PhanUndeclaredMethod
      */
     protected static function __instanciate__(): object
     {
 
-        if (trait_exists($class = self::$__class__ ??= static::class) || interface_exists($class))
+        $class = self::$__class__ ??= static::class;
+
+        if (trait_exists($class) || interface_exists($class))
         {
             RuntimeError::raise('Cannot instanciate %s.', $class);
         }
@@ -57,15 +60,16 @@ trait Singleton
 
         try
         {
-            $reflector = new ReflectionMethod($self, $method);
-
-            return $reflector->invokeArgs($self, $arguments);
+            return (new ReflectionMethod($self, $method))->invokeArgs($self, $arguments);
         } catch (ReflectionException $prev)
         {
             return NotImplementedError::raise('%s::%s() is not implemented.', static::class, $method, previous: $prev);
         }
     }
 
+    /**
+     * Translates static call into instance call
+     */
     public static function __callStatic(string $name, array $arguments): mixed
     {
 
