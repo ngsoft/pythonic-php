@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Python;
+namespace Pythonic\Errors;
 
 class KeyError extends Error
 {
