@@ -10,9 +10,35 @@ namespace Python\Collections;
 abstract class AbcMapping extends AbcCollection
 {
 
-    protected function __getitem__(mixed $key): mixed
+    abstract protected function __getitem__(mixed $key): mixed;
+
+    public function get(mixed $key, mixed $default = null): mixed
     {
 
+        try
+        {
+            return $this[$key];
+        } catch (\Python\KeyError)
+        {
+            return $default;
+        }
+    }
+
+    protected function __contains__(mixed $value): bool
+    {
+
+        try
+        {
+            return $this[$value] !== null;
+        } catch (\Python\KeyError)
+        {
+            return false;
+        }
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return $this->__contains__($offset);
     }
 
 }
