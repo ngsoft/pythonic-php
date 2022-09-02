@@ -11,6 +11,20 @@ namespace Python;
 class PClass
 {
 
+    protected array $__slots__ = [];
+
+    public function __invoke(string $method, mixed ...$arguments): mixed
+    {
+
+
+        if ( ! (str_starts_with($method, '__') && str_ends_with($method, '__') && length($method) > 4 ) || ! method_exists($this, $method))
+        {
+            throw new BadMethodCallException(sprintf('%s::%s() is not implemented.', static::class, $method));
+        }
+
+        return call_user_func_array([$this, $method], $args);
+    }
+
     final public function __set(string $name, mixed $value): void
     {
         $this->__setattr__($name, $value);
@@ -41,7 +55,7 @@ class PClass
 
     protected function __setattr__(string $name, mixed $value): void
     {
-        if ( ! property_exists($this, $name))
+        if ( ! in_array($name, $this->__slots__))
         {
             throw new AttributeError(sprintf("'%s' object has no attribute '%s'", static::class, $name));
         }
@@ -56,12 +70,14 @@ class PClass
 
     protected function __getattribute__(string $name): mixed
     {
-
-        if ( ! property_exists($this, $name))
+        if ( ! in_array($name, $this->__slots__))
         {
             throw new AttributeError(sprintf("'%s' object has no attribute '%s'", static::class, $name));
         }
-
+        if ( ! property_exists($this, $name))
+        {
+            return null;
+        }
         return $this->{$name};
     }
 
