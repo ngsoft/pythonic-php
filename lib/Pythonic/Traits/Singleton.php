@@ -28,12 +28,16 @@ trait Singleton
     /**
      * Instanciate the unique instance
      * Override this to add arguments if needed
+     *
      */
     protected static function __instanciate__(): object
     {
 
         $class = self::$__class__ ??= static::class;
-
+        if (trait_exists($class))
+        {
+            RuntimeException::raise('Cannot instanciate trait %s.', $class);
+        }
         return new $class();
     }
 

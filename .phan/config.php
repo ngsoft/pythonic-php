@@ -67,5 +67,7 @@ return [
         'PhanRedefinedInheritedInterface',
         'PhanParamTooManyInternal',
         'PhanTypeInstantiateAbstractStatic',
+        'PhanCompatibleAccessMethodOnTraitDefinition',
+        'PhanTraitParentReference',
     ]
 ];

@@ -8,11 +8,25 @@ trait ErrorHelper
 {
 
     /**
-     * Uses vprintf to format the exception
+     * Default error message
+     * Overrides this to change it
      */
-    public static function vprintf(string $message, mixed ...$values)
-    {
+    protected static string $__default__ = '';
 
+    /**
+     * Override this to construct message programmatically
+     */
+    protected static function __message__(string $message): string
+    {
+        return $message === '' ? static::$__default__ : $message;
+    }
+
+    /**
+     * Uses vprintf to format the exception
+     * @phan-suppress PhanPluginPrintfVariableFormatString
+     */
+    public static function message(string $message, mixed ...$values)
+    {
 
         if (count($values))
         {
@@ -25,11 +39,21 @@ trait ErrorHelper
     /**
      * Throw error directly
      */
-    public function raise(string $message, mixed ...$values): never
+    public static function raise(string $message, mixed ...$values): never
+    {
+        throw new static(static::message($message, ...$values));
+    }
+
+    public function __construct(string $message = "", int $code = 0, ?\Throwable $previous = null)
     {
 
+        if ( ! ($this instanceof \Throwable))
+        {
 
-        throw new static(static::vprintf($message));
+            return;
+        }
+
+        parent::__construct(static::__message__($message), $code, $previous);
     }
 
 }
