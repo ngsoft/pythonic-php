@@ -12,4 +12,9 @@ abstract class ScalarType extends Type
         return $this->__name__ ??= mb_strtolower(preg_replace('#Type$#', '', static::classname()));
     }
 
+    public function alias(): string
+    {
+        return $this->name();
+    }
+
 }
