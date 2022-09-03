@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Pythonic\Types;
 
-interface BootAble
+class All
 {
 
-    public static function __boot__(): void;
+    static protected array $__all__ = [];
+
 }

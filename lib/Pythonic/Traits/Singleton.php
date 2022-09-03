@@ -38,7 +38,7 @@ trait Singleton
     protected static function __instanciate__(): object
     {
 
-        $class = self::$__class__ ??= static::class;
+        $class = static::$__class__ ??= static::class;
 
         if (trait_exists($class) || interface_exists($class))
         {

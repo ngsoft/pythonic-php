@@ -114,7 +114,7 @@ class Importer
 
         while (null !== $resource = array_shift($resources))
         {
-            $result[] = $this->_import($resource);
+            $result[] = $this->importSingle($resource);
         }
 
         return $result;
