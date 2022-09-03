@@ -7,9 +7,11 @@ namespace Pythonic\Typing;
 abstract class ScalarType extends Type
 {
 
+    protected ?string $name = null;
+
     public function name(): string
     {
-        return $this->__name__ ??= mb_strtolower(preg_replace('#Type$#', '', static::classname()));
+        return $this->name ??= mb_strtolower(preg_replace('#Type$#', '', static::classname()));
     }
 
     public function alias(): string

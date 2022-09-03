@@ -15,15 +15,12 @@ abstract class Type
         NotInstanciable,
         ClassUtils;
 
-    /** @var ?string */
-    protected $__name__ = null;
-
     /**
      * Get type name
      */
     public static function __name__(): string
     {
-        return static::instance()->__name__ ??= static::instance()->name();
+        return static::instance()->name();
     }
 
     /**
