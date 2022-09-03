@@ -4,6 +4,17 @@ declare(strict_types=1);
 
 namespace Pythonic\Utils;
 
+use ArrayAccess,
+    Countable,
+    Pythonic\Errors\TypeError,
+    Stringable,
+    Throwable;
+use function array_is_list,
+             get_debug_type;
+
+/**
+ * Modded methods found in ngsoft/tools, illuminate/support
+ */
 abstract class Utils
 {
 
@@ -48,6 +59,195 @@ abstract class Utils
         }
 
         return array_unique($results);
+    }
+
+    /**
+     * Checks if number is between min and max
+     */
+    public static function in_range(int|float $number, int|float $min, int|float $max, bool $inclusive = true): bool
+    {
+
+
+        if ($min === $max)
+        {
+            return $number === $min && $inclusive;
+        }
+
+        // swap arguments
+        if ($min > $max)
+        {
+            [$min, $max] = [$max, $min];
+        }
+
+        if ($inclusive)
+        {
+            return $number >= $min && $number <= $max;
+        }
+
+
+        return $number > $min && $number < $max;
+    }
+
+    /**
+     * Get the length of a scalar|array|Countable
+     */
+    public static function length(mixed $value): int
+    {
+
+        if ( ! is_scalar($value) && ! is_countable($value))
+        {
+            TypeError::raise('object of type %s has no length.', get_debug_type($value));
+        }
+
+        switch (get_debug_type($value))
+        {
+            case 'bool':
+                return $value ? 1 : 0;
+            case 'int':
+            case 'float':
+                return $value > 0 ? (int) $value : 0;
+            case 'string':
+                return $value === '' ? 0 : mb_strlen($value);
+        }
+
+        return count($value);
+    }
+
+    /**
+     * Checks if value is not negative
+     */
+    public static function is_unsigned(int|float $value): bool
+    {
+        return (int) $value >= 0;
+    }
+
+    /**
+     * Check if value is Array like
+     */
+    public static function is_arrayaccess(mixed $value): bool
+    {
+
+        if (is_array($value))
+        {
+            return true;
+        }
+
+
+        return $value instanceof ArrayAccess && $value instanceof Countable;
+    }
+
+    /**
+     * Checks if value can be converted to string
+     */
+    public static function is_stringable(mixed $value): bool
+    {
+        if (is_scalar($value) || is_null($value))
+        {
+            return true;
+        }
+        if ($value instanceof Stringable)
+        {
+            return true;
+        }
+
+        if (is_object($value) && method_exists($value, '__toString'))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get string value of a variable
+     */
+    public static function strval(mixed $value): string
+    {
+        if (is_string($value))
+        {
+            return $value;
+        }
+
+        if (is_null($value))
+        {
+            return '';
+        }
+
+        if (is_bool($value))
+        {
+            return $value ? 'true' : 'false';
+        }
+
+        // prevents another method call
+        if (is_numeric($value))
+        {
+            return (string) $value;
+        }
+
+
+        // checks $value->__toString()
+        if ( ! static:: is_stringable($value))
+        {
+            TypeError::raise('value of type %s is not stringable.', get_debug_type($value));
+        }
+
+
+        return (string) $value;
+    }
+
+    /**
+     * Checks if value is a sequence
+     */
+    public static function is_sequence(mixed $value): bool
+    {
+
+        if ( ! is_iterable($value) && ! static::is_arrayaccess($value))
+        {
+            return false;
+        }
+
+
+        if (is_array($value))
+        {
+            return array_is_list($value);
+        }
+
+        // array|Traversable
+        if (is_iterable($value))
+        {
+            $nextKey = -1;
+
+            foreach ($value as $k => $_)
+            {
+                if ($k !== ++ $nextKey)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // ArrayAccess&Countable
+        for ($offset = 0; $offset < count($value); $offset ++)
+        {
+
+            try
+            {
+                // isset can return false negative isset(0), isset(false): we want isset(null)
+                if ($value[$offset] === null)
+                {
+                    return false;
+                }
+            }
+            // offsetGet can throw exceptions depending implementation
+            catch (Throwable)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

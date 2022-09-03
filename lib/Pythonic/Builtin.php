@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pythonic;
 
 use Pythonic\{
-    Errors\TypeError, Utils\Importer
+    Errors\TypeError, Typing\Types, Utils\Importer, Utils\Utils
 };
 use function get_debug_type;
 
@@ -66,12 +66,22 @@ function isinstance(mixed $object, string ...$types): bool
 
     foreach ($types as $type)
     {
+
+        // pythonic types
+        if (Types::isType($object, $type))
+        {
+            return true;
+        }
+
+
         // scalar types and called class
         if (get_debug_type($object) === $type)
         {
             return true;
         }
 
+
+        // fallback to subclassof
         if ( ! is_object($object))
         {
             continue;
@@ -89,13 +99,7 @@ function isinstance(mixed $object, string ...$types): bool
         }
 
 
-        if (Utils\Utils::uses_trait($object, $type))
-        {
-            return true;
-        }
-
-
-        if (Typing\Types::isType($object, $type))
+        if (Utils::uses_trait($object, $type))
         {
             return true;
         }

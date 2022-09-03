@@ -22,4 +22,4 @@ require_once __DIR__ . '/Pythonic/Builtin.php';
 
 Types::__boot__();
 
-Types::checkType(10, bool);
+var_dump(Pythonic\isinstance(10, int));
