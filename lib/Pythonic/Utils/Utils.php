@@ -118,7 +118,7 @@ abstract class Utils
      */
     public static function is_unsigned(int|float $value): bool
     {
-        return (int) $value >= 0;
+        return $value >= 0;
     }
 
     /**
@@ -229,7 +229,7 @@ abstract class Utils
         }
 
         // ArrayAccess&Countable
-        for ($offset = 0; $offset < count($value); $offset ++)
+        for ($offset = 0; $offset < count($value); $offset ++ )
         {
 
             try
