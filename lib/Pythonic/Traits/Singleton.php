@@ -25,9 +25,9 @@ trait Singleton
      * The class to instanciate
      * Override this to instanciate another class
      *
-     * @var string
+     * @var ?string
      */
-    protected static ?string $__class__ = null;
+    protected static $__class__ = null;
 
     /**
      * Instanciate the unique instance
@@ -61,7 +61,8 @@ trait Singleton
         try
         {
             return (new ReflectionMethod($self, $method))->invokeArgs($self, $arguments);
-        } catch (ReflectionException $prev)
+        }
+        catch (ReflectionException $prev)
         {
             return NotImplementedError::raise('%s::%s() is not implemented.', static::class, $method, previous: $prev);
         }
