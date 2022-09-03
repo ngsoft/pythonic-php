@@ -31,12 +31,6 @@ class Importer
      */
     protected ?string $from = null;
 
-    /**
-     * Last import
-     * @var string|null
-     */
-    protected ?string $last = null;
-
     protected static function convertToPythonic(string $namespace): string
     {
         $namespace = trim($namespace, '.\\');
@@ -73,49 +67,63 @@ class Importer
      */
     public static function from(string $namespace): static
     {
-        return static::instance()->_from($namespace);
-    }
+        $self = static::instance();
 
-    /**
-     * Replaces the python from keyword
-     * usage $resource = from('namespace.subnamespace')->import('name')
-     */
-    protected function _from(string $namespace): static
-    {
-        $this->from = static::getAlias($namespace);
-        return $this;
+        $self->from = $namespace === '' ? null : static::getAlias($namespace);
+
+        return $self;
     }
 
     /**
      * imports a resource that can be a function name or class name
      */
-    public static function import(string|array $resource, &$as = null): string|array
+    public static function import(string|array $resource, &$as = null, ?string $from = null): string|array
     {
-        return
-                $as = is_array($resource) ?
-                static::instance()->_importMany($resource) :
-                static::instance()->_import($resource);
+
+        try
+        {
+            if ($from)
+            {
+                static::from($from);
+            }
+
+
+            return
+                    $as = is_array($resource) ?
+                    static::instance()->importMany($resource) :
+                    static::instance()->importSingle($resource);
+        } finally
+        {
+            static::instance()->from = null;
+        }
     }
 
     /**
      * Returse a tuple of resources
      */
-    protected function _importMany(array $resources): array
+    protected function importMany(array $resources): array
     {
 
         if (empty($resources))
         {
-            ImportError::raise('Cannot import empty resources.');
+            ImportError::raise();
         }
 
 
         $result = [];
+
+        while (null !== $resource = array_shift($resources))
+        {
+            $result[] = $this->_import($resource);
+        }
+
+        return $result;
     }
 
     /**
      * imports a resource that can be a function name or class name
      */
-    protected function _import(string $resource): string
+    protected function importSingle(string $resource): string
     {
 
 
@@ -151,17 +159,9 @@ class Importer
         } catch (ReflectionException)
         {
             // do nothing
-        } finally
-        {
-            $this->from = null;
         }
 
         return ImportError::raise('Cannot find module: %s', $resource);
-    }
-
-    protected function _as(&$resource): void
-    {
-        $resource = $this->last;
     }
 
 }

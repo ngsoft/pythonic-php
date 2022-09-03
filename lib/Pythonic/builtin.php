@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
+use Pythonic\Utils\Importer;
+
+/**
+ * Set the namespace for imported resources
+ */
 function from(string $namespace): Importer
 {
     return Importer::from($namespace);
 }
 
-function import(string $resource): mixed
+/**
+ * Imports a resource that can be a function name or class name
+ */
+function import(string|array $resource, &$as = null, ?string $from = null): string|array
 {
-    return Importer::import($resource);
+    return Importer::import($resource, $as, $from);
 }
