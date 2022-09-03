@@ -33,14 +33,17 @@ final class Types
                     continue;
                 }
 
-                $path = __DIR__ . DIRECTORY_SEPARATOR . $file;
 
-                if ($path === __FILE__ || $file === 'Type.php')
+
+                if (in_array($file, ['Type.php', 'Types.php', 'ScalarType.php']))
                 {
                     continue;
                 }
 
+
+
                 $class = __NAMESPACE__ . NAMESPACE_SEPARATOR . substr($file, 0, - 4);
+                $path = __DIR__ . DIRECTORY_SEPARATOR . $file;
 
                 if ( ! self::isValidType($class))
                 {

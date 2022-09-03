@@ -17,9 +17,9 @@ trait Singleton
 {
 
     /**
-     * @var ?object
+     * @var object[]
      */
-    protected static ?object $__instance__ = null;
+    protected static array $__instance__ = [];
 
     /**
      * The class to instanciate
@@ -38,7 +38,7 @@ trait Singleton
     protected static function __instanciate__(): object
     {
 
-        $class = static::$__class__ ??= static::class;
+        $class = static::$__class__ ?? static::class;
 
         if (trait_exists($class) || interface_exists($class))
         {
@@ -52,7 +52,7 @@ trait Singleton
      */
     public static function instance(): object
     {
-        return self::$__instance__ ??= self::__instanciate__();
+        return static::$__instance__[static::class] ??= static::__instanciate__();
     }
 
     protected static function executeMethod(object $self, string $method, array $arguments): mixed
