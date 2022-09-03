@@ -30,7 +30,7 @@ if ( ! function_exists('safe_include'))
 
         if (isset($__name__))
         {
-
+            Importer::alias($__name__);
         }
 
         if (isset($__all__))
