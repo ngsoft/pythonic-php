@@ -81,7 +81,7 @@ class Importer
     }
 
     /**
-     * imports a resource that can be a function name or class name
+     * imports resource(s) that can be a function name or class name
      */
     public static function import(string|array $resource, &$as = null, ?string $from = null): string|array
     {
