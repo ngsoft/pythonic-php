@@ -9,7 +9,7 @@ class StopIteration extends Exception
 
     protected function __default__(): string
     {
-        return 'Iteration has stopped';
+        return 'Iteration has been stopped.';
     }
 
 }
