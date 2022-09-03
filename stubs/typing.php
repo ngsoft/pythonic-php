@@ -8,3 +8,4 @@ define('int', 'int');
 define('string', 'string');
 define('NoneType', 'NoneType');
 
+define('NotImplemented', 'NotImplementedType');

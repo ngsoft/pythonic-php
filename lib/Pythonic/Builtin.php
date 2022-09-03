@@ -62,9 +62,9 @@ function issubclass(mixed $object, string ...$types): bool
 function isinstance(mixed $object, string ...$types): bool
 {
 
-    if (empty($types))
+    if (count(func_num_args() < 2))
     {
-        throw new InvalidArgumentException('At least one type is required.');
+        TypeError::raiseArgumentCountError('isinstance', 2, func_num_args());
     }
 
 
@@ -99,7 +99,7 @@ function isinstance(mixed $object, string ...$types): bool
         }
 
 
-        if (Typing\Types::checkType($object, $type))
+        if (Typing\Types::isType($object, $type))
         {
             return true;
         }
