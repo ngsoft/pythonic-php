@@ -15,7 +15,8 @@ abstract class Type
         NotInstanciable,
         ClassUtils;
 
-    protected ?string $__name__ = null;
+    /** @var ?string */
+    protected $__name__ = null;
 
     /**
      * Get type name

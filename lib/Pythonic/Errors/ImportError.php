@@ -7,6 +7,6 @@ namespace Pythonic\Errors;
 class ImportError extends Error
 {
 
-    protected static string $__default__ = 'Cannot import module';
+    protected $__default__ = 'Cannot import module';
 
 }

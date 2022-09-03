@@ -10,15 +10,17 @@ trait ErrorHelper
     /**
      * Default error message
      * Overrides this to change it
+     *
+     * @var string
      */
-    protected static string $__default__ = '';
+    protected $__default__ = '';
 
     /**
      * Override this to construct message programmatically
      */
-    public static function __message__(string $message): string
+    protected function __message__(string $message, string $default): string
     {
-        return $message === '' ? static::$__default__ : $message;
+        return $message === '' ? $default : $message;
     }
 
     /**
@@ -61,7 +63,7 @@ trait ErrorHelper
             return;
         }
 
-        parent::__construct(static::__message__($message), $code, $previous);
+        parent::__construct($this->__message__($message, $this->__default__), $code, $previous);
     }
 
 }
