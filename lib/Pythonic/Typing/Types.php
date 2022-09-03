@@ -127,7 +127,23 @@ final class Types
         return $type::__test__($value);
     }
 
-    public static function getDefined(): array
+    /**
+     * same as checkType but without raising error
+     */
+    public static function isType(mixed $value, string $type): bool
+    {
+
+        try
+        {
+            return self::checkType($value, $type);
+        }
+        catch (TypeError)
+        {
+            return false;
+        }
+    }
+
+    public static function __defined__(): array
     {
         return self::$_defined;
     }
