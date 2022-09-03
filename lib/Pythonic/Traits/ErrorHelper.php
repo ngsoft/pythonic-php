@@ -46,7 +46,7 @@ trait ErrorHelper
      */
     public static function printf(string $message, mixed ...$values): string
     {
-        unset($values['previous']);
+        unset($values['previous'], $values['code']);
 
         if (count($values))
         {
@@ -60,9 +60,10 @@ trait ErrorHelper
      */
     public static function message(string $message, mixed ...$values)
     {
-        // intercept variadic previous: $error
+        // intercept variadic previous and code
         $prev = $values['previous'] ?? null;
-        return new static(static::printf($message, ...$values), previous: $prev);
+        $code = $values['code'] ?? 0;
+        return new static(static::printf($message, ...$values), $code, $prev);
     }
 
     /**
