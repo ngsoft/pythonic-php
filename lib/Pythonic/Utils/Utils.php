@@ -229,7 +229,7 @@ abstract class Utils
         }
 
         // ArrayAccess&Countable
-        for ($offset = 0; $offset < count($value); $offset ++ )
+        for ($offset = 0; $offset < count($value); $offset ++)
         {
 
             try
@@ -248,6 +248,23 @@ abstract class Utils
         }
 
         return true;
+    }
+
+    /**
+     * Count number of occurences of value inside iterable
+     */
+    public static function count_value(mixed $value, iterable $iterable): int
+    {
+        $cnt = 0;
+
+        foreach ($iterable as $_value)
+        {
+            if ($_value === $value)
+            {
+                $cnt ++;
+            }
+        }
+        return $cnt;
     }
 
 }

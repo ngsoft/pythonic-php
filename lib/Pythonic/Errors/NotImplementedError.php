@@ -12,4 +12,13 @@ class NotImplementedError extends RuntimeError
         return 'Not implemented';
     }
 
+    public static function raiseForMethod(object|string $class, string $method): never
+    {
+        if (is_object($class))
+        {
+            $class = get_class($class);
+        }
+        throw static::message('Method %s must be implemented by %s', $message, $class);
+    }
+
 }

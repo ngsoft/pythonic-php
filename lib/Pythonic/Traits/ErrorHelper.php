@@ -45,6 +45,7 @@ trait ErrorHelper
     public static function printf(string $message, mixed ...$values): string
     {
         unset($values['previous']);
+
         if (count($values))
         {
             $message = vsprintf($message, $values);
