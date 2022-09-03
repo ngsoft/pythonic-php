@@ -7,20 +7,35 @@ namespace Pythonic\Traits;
 trait ErrorHelper
 {
 
+    use ClassUtils;
+
     /**
      * Default error message
      * Overrides this to change it
      *
-     * @var string
+     * @var string[]
      */
-    protected $__default__ = '';
+    protected static array $__default__ = [];
+
+    /**
+     * Override this to set a default error message
+     */
+    protected function __default__(): string
+    {
+        return ltrim(preg_replace('#([A-Z])#', ' $1', static::classname()));
+    }
 
     /**
      * Override this to construct message programmatically
      */
     protected function __message__(string $message): string
     {
-        return $message === '' ? $this->__default__ : $message;
+        if ($message !== '')
+        {
+            return $message;
+        }
+
+        return static::$__default__[static::class] ??= $this->__default__();
     }
 
     /**

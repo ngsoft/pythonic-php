@@ -7,6 +7,9 @@ namespace Pythonic\Errors;
 class NotImplementedError extends RuntimeError
 {
 
-    protected $__default__ = 'Not implemented';
+    protected function __default__(): string
+    {
+        return 'Not implemented';
+    }
 
 }
