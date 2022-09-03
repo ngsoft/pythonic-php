@@ -32,7 +32,7 @@ if ( ! function_exists('safe_include'))
 
         $__all__ = $__name__ = null;
 
-        $result = require_once $__file__;
+        $result = require $__file__;
 
         if (isset($__all__) && isset($__name__))
         {
