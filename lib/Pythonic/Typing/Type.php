@@ -54,7 +54,7 @@ abstract class Type
      */
     public function alias(): string
     {
-        return $this->name();
+        return static::class();
     }
 
     /**

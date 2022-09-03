@@ -62,9 +62,9 @@ function issubclass(mixed $object, string ...$types): bool
 function isinstance(mixed $object, string ...$types): bool
 {
 
-    if (count(func_num_args() < 2))
+    if (count($types) === 0)
     {
-        TypeError::raiseArgumentCountError('isinstance', 2, func_num_args());
+        TypeError::raiseArgumentCountError('isinstance', 2, 1);
     }
 
 

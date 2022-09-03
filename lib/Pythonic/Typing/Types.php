@@ -17,8 +17,11 @@ final class Types
 
     use NotInstanciable;
 
-    static protected array $__all__ = [];
-    static protected array $_defined = [];
+    static protected array $__all__ = [
+        NotImplementedType::class
+    ];
+    static protected array $__defined__ = [
+    ];
 
     public static function __boot__(): void
     {
@@ -77,19 +80,23 @@ final class Types
             TypeError::raise('invalid type %s', $type);
         }
 
-        $name = $type::__name__();
 
-        if (isset(self::$__all__[$name]))
+        if (in_array($type, self::$__all__))
         {
             return;
         }
 
-        self::$__all__[$name] = $type;
+
+        // inserts custom types before builtin types
+        array_unshift(self::$__all__, $type);
+
+        [$name, $alias] = [$type::__name__(), $type::__alias__()];
+
+        self::$__defined__[$name] = $alias;
 
         if ( ! defined($name))
         {
-            define($name, $type::__alias__());
-            self::$_defined[$name] = constant($name);
+            define($name, $alias);
         }
     }
 
@@ -117,7 +124,7 @@ final class Types
      */
     public static function checkType(mixed $value, string $type): bool
     {
-        $type = self::$__all__[$type] ?? $type;
+        $type = self::$__defined__ [$type] ?? $type;
 
         if ( ! self::isValidType($type))
         {
@@ -145,7 +152,7 @@ final class Types
 
     public static function __defined__(): array
     {
-        return self::$_defined;
+        return self::$__defined__;
     }
 
 }
