@@ -7,7 +7,7 @@ namespace Pythonic\Typing;
 class NotImplementedType extends Type
 {
 
-    protected ?string $alias = 'NotImplemented';
+    protected $alias = 'NotImplemented';
 
     public function test(mixed $value): bool
     {

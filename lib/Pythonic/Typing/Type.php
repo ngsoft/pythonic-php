@@ -15,8 +15,8 @@ abstract class Type
         NotInstanciable,
         ClassUtils;
 
-    protected ?string $name = null;
-    protected ?string $alias = null;
+    protected $name = null;
+    protected $alias = null;
 
     /**
      * Get type name
