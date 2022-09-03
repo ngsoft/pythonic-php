@@ -54,7 +54,6 @@ class Importer
     public static function alias(string $to, string $from): void
     {
 
-
         if ($from === $to)
         {
             return;
