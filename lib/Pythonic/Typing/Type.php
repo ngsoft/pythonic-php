@@ -25,11 +25,17 @@ abstract class Type
         return static::instance()->name();
     }
 
+    /**
+     * Test if value is type
+     */
     public static function __test__(mixed $value): bool
     {
         return static::instance()->test($value);
     }
 
+    /**
+     * Alias to use for Type constant
+     */
     public static function __alias__(): string
     {
         return static::class;

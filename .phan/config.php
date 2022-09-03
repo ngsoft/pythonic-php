@@ -21,6 +21,7 @@ return [
     'directory_list' => [
         'src',
         'lib',
+        'stubs',
         'vendor',
     ],
     // A directory list that defines files that will be excluded
@@ -35,6 +36,7 @@ return [
     //       should be added to the `directory_list` as
     //       to `exclude_analysis_directory_list`.
     "exclude_analysis_directory_list" => [
+        'stubs/',
         'vendor/',
     ],
     // A list of plugin files to execute.

@@ -42,4 +42,5 @@ require_once __DIR__ . '/Pythonic/builtin.php';
 
 Pythonic\Typing\Types::boot();
 
-var_dump(constant('string'));
+string;
+

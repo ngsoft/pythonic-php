@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Pythonic\Typing;
 
-use Pythonic\{
-    Errors\TypeError, Traits\ClassUtils
-};
+use Pythonic\Errors\TypeError,
+    ReflectionClass;
 use const NAMESPACE_SEPARATOR;
 use function get_debug_type,
              str_ends_with;
@@ -33,19 +32,14 @@ final class Types
                     continue;
                 }
 
+                $file = substr($file, 0, - 4);
 
-
-                if (in_array($file, ['Type.php', 'Types.php', 'ScalarType.php']))
+                if (in_array($file, ['Type', 'Types', 'ScalarType']))
                 {
                     continue;
                 }
 
-
-
-                $class = __NAMESPACE__ . NAMESPACE_SEPARATOR . substr($file, 0, - 4);
-                $path = __DIR__ . DIRECTORY_SEPARATOR . $file;
-
-                if ( ! self::isValidType($class))
+                if ( ! self::isValidType($class = __NAMESPACE__ . NAMESPACE_SEPARATOR . $file))
                 {
                     continue;
                 }
@@ -59,7 +53,7 @@ final class Types
     {
         static $cache = [];
 
-        return $cache[$type] ??= is_subclass_of($type, Type::class, true) && ! (new \ReflectionClass($type))->isAbstract();
+        return $cache[$type] ??= is_subclass_of($type, Type::class, true) && ! (new ReflectionClass($type))->isAbstract();
     }
 
     /**
