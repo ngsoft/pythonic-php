@@ -17,9 +17,18 @@ final class Types
 
     use NotInstanciable;
 
-    static protected array $__all__ = [
-        NotImplementedType::class
+    private const BUILTIN_TYPES = [
+        // primitives
+        StringType::class,
+        FloatType::class,
+        IntType::class,
+        BoolType::class,
+        NoneType::class,
+        // first one to check (overrides string type)
+        NotImplementedType::class,
     ];
+
+    static protected array $__all__ = [];
     static protected array $__defined__ = [
     ];
 
@@ -32,29 +41,14 @@ final class Types
         {
             $booted = true;
 
-            foreach (scandir(__DIR__) ?: [] as $file)
+            foreach (self::BUILTIN_TYPES as $type)
             {
-
-                if ( ! str_ends_with($file, '.php'))
-                {
-                    continue;
-                }
-
-                $file = substr($file, 0, - 4);
-
-                if (in_array($file, ['Type', 'Types', 'ScalarType']))
-                {
-                    continue;
-                }
-
-                if ( ! self::isValidType($class = __NAMESPACE__ . NAMESPACE_SEPARATOR . $file))
-                {
-                    continue;
-                }
-
-                self::addType($class);
+                self::register($type);
             }
         }
+
+
+        var_dump(self::$__all__, self::$__defined__);
     }
 
     protected static function isValidType(string $type): bool
@@ -67,7 +61,7 @@ final class Types
     /**
      * Add a Type
      */
-    public static function addType(string|Type $type): void
+    public static function register(string|Type $type): void
     {
 
         if (is_object($type))
@@ -87,10 +81,10 @@ final class Types
         }
 
 
-        // inserts custom types before builtin types
-        array_unshift(self::$__all__, $type);
-
         [$name, $alias] = [$type::__name__(), $type::__alias__()];
+
+        // inserts custom types before builtin types
+        self::$__all__ = [$name => $type] + self::$__all__;
 
         self::$__defined__[$name] = $alias;
 
@@ -124,7 +118,7 @@ final class Types
      */
     public static function checkType(mixed $value, string $type): bool
     {
-        $type = self::$__defined__ [$type] ?? $type;
+        $type = self::$__all__ [$type] ?? $type;
 
         if ( ! self::isValidType($type))
         {
