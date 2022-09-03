@@ -8,3 +8,5 @@ define('int', 'int');
 define('string', 'string');
 define('NoneType', \Pythonic\Typing\NoneType::class);
 define('NotImplemented', \Pythonic\Typing\NotImplementedType::class);
+
+define('ArrayType', 'array');
