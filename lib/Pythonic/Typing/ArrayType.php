@@ -7,10 +7,7 @@ namespace Pythonic\Typing;
 class ArrayType extends Type
 {
 
-    public function name(): string
-    {
-        return 'array';
-    }
+    protected ?string $name = 'array';
 
     public function test(mixed $value): bool
     {
