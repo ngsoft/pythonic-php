@@ -7,6 +7,6 @@ namespace Pythonic\Errors;
 class NameError extends Error
 {
 
-    protected $__default__ = 'invalid empty name';
+    protected $__default__ = 'invalid name';
 
 }

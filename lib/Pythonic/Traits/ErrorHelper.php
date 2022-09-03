@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Errors;
+namespace Pythonic\Traits;
 
 trait ErrorHelper
 {
@@ -18,9 +18,9 @@ trait ErrorHelper
     /**
      * Override this to construct message programmatically
      */
-    protected function __message__(string $message, string $default): string
+    protected function __message__(string $message): string
     {
-        return $message === '' ? $default : $message;
+        return $message === '' ? $this->__default__ : $message;
     }
 
     /**
@@ -63,7 +63,7 @@ trait ErrorHelper
             return;
         }
 
-        parent::__construct($this->__message__($message, $this->__default__), $code, $previous);
+        parent::__construct($this->__message__($message), $code, $previous);
     }
 
 }
