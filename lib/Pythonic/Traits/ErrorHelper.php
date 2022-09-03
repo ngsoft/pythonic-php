@@ -27,7 +27,7 @@ trait ErrorHelper
     {
         $message = ltrim(preg_replace('#([A-Z])#', ' $1', static::classname()));
 
-        return mb_strtoupper($message[0]) . mb_strtolower(mb_substr($message, 1,));
+        return mb_strtoupper($message[0]) . mb_strtolower(mb_substr($message, 1));
     }
 
     /**
