@@ -6,3 +6,5 @@ define('bool', 'bool');
 define('float', 'float');
 define('int', 'int');
 define('string', 'string');
+
+define('NoneType', 'NoneType');

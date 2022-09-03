@@ -38,7 +38,7 @@ abstract class Type
      */
     public static function __alias__(): string
     {
-        return static::class;
+        return static::instance()->alias();
     }
 
     /**
@@ -49,10 +49,18 @@ abstract class Type
 
         if ($this->__name__ === '')
         {
-            $this->__name__ = mb_strtolower(preg_replace('#Type$#', '', static::classname()));
+            $this->__name__ = static::classname();
         }
 
         return $this->__name__;
+    }
+
+    /**
+     * get aliased name
+     */
+    public function alias(): string
+    {
+        return $this->name();
     }
 
     /**

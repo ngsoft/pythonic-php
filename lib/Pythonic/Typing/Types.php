@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Pythonic\Typing;
 
-use Pythonic\Errors\TypeError,
-    ReflectionClass;
+use Pythonic\{
+    Errors\TypeError, Traits\NotInstanciable
+};
+use ReflectionClass;
 use const NAMESPACE_SEPARATOR;
 use function get_debug_type,
              str_ends_with;
 
 final class Types
 {
+
+    use NotInstanciable;
 
     static protected array $__all__ = [];
 
@@ -90,7 +94,7 @@ final class Types
     /**
      * Get Type from value
      */
-    public function getType(mixed $value): Type
+    public static function getType(mixed $value): Type
     {
 
         /** @var Type $type */
@@ -109,11 +113,16 @@ final class Types
     /**
      * Checks if type mathes inputed type
      */
-    public function checkType(mixed $value, string $type): bool
+    public static function checkType(mixed $value, string $type): bool
     {
         $type = self::$__all__[$type] ?? $type;
 
-        return $this->getType($value) === $type;
+        if ( ! self::isValidType($type))
+        {
+            TypeError::raise('invalid type %s', $type);
+        }
+
+        return $type::__test__($value);
     }
 
 }

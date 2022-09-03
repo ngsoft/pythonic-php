@@ -10,6 +10,14 @@ if ( ! defined('NAMESPACE_SEPARATOR'))
 }
 
 
+if ( ! defined('None'))
+{
+    /**
+     * Python None
+     */
+    define('None', null);
+}
+
 if ( ! function_exists('import'))
 {
 
@@ -42,5 +50,5 @@ require_once __DIR__ . '/Pythonic/builtin.php';
 
 Pythonic\Typing\Types::boot();
 
-string;
+var_dump(Pythonic\Typing\Types::checkType(10, int));
 
