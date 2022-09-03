@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Types;
+namespace Pythonic\Typing;
 
-use Pythonic\{
-    Errors\NameError, Traits\NotInstanciable, Traits\Singleton
+use Pythonic\Traits\{
+    ClassUtils, NotInstanciable, Singleton
 };
 
 abstract class Type
 {
 
     use Singleton,
-        NotInstanciable;
+        NotInstanciable,
+        ClassUtils;
 
     protected string $__name__ = '';
 
@@ -24,9 +25,14 @@ abstract class Type
         return static::instance()->name();
     }
 
-    public function __test__(mixed $value): bool
+    public static function __test__(mixed $value): bool
     {
         return static::instance()->test($value);
+    }
+
+    public static function __alias__(): string
+    {
+        return static::class;
     }
 
     /**
@@ -37,7 +43,7 @@ abstract class Type
 
         if ($this->__name__ === '')
         {
-            NameError::raise();
+            $this->__name__ = mb_strtolower(preg_replace('#Type$#', '', static::classname()));
         }
 
         return $this->__name__;

@@ -20,7 +20,7 @@ trait ClassUtils
      */
     protected static function classname(): string
     {
-        return basename(str_replace('\\', '/', static::class));
+        return basename(str_replace('\\', '/', static::class()));
     }
 
     /**
@@ -29,7 +29,7 @@ trait ClassUtils
     protected static function namespace(): string
     {
 
-        $class = static::class;
+        $class = static::class();
 
         if ( ! str_contains($class, NAMESPACE_SEPARATOR))
         {
