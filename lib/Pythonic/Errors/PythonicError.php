@@ -10,5 +10,8 @@ namespace Pythonic\Errors;
 interface PythonicError extends \Throwable
 {
 
+    /**
+     * Throw error directly
+     */
     public static function raise(string $message = '', mixed ...$values): never;
 }
