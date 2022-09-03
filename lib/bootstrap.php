@@ -24,4 +24,3 @@ require_once __DIR__ . '/Pythonic/Builtin.php';
 
 Types::__boot__();
 
-var_dump(Pythonic\isinstance((float) 10, float));
