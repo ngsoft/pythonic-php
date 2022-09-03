@@ -15,7 +15,7 @@ class NotImplementedType extends Type
     public function test(mixed $value): bool
     {
 
-        return $value === __CLASS__;
+        return $value === $this->name() || $value === $this->alias() || $value === __CLASS__;
     }
 
 }

@@ -24,4 +24,4 @@ require_once __DIR__ . '/Pythonic/Builtin.php';
 
 Types::__boot__();
 
-var_dump(Pythonic\Typing\Types::checkType([], ArrayType));
+var_dump(Pythonic\Typing\Types::getType(null));
