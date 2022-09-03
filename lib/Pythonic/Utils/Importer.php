@@ -51,8 +51,13 @@ class Importer
     /**
      * Alias a namespace
      */
-    public static function alias(string $to, string $from): void
+    public static function alias(string $to, string $from = ''): void
     {
+        if ($from === '')
+        {
+            $from = 'pythonic.' . $to;
+        }
+
         static::$_aliases[self::convertToPythonic($to)] = self::convertToPythonic($from);
     }
 

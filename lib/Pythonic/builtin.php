@@ -6,6 +6,11 @@ namespace Pythonic;
 
 use Pythonic\Utils\Importer;
 
+$__all__ = [
+    'from',
+    'import',
+];
+
 /**
  * Set the namespace for imported resources
  */
