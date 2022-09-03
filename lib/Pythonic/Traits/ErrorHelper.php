@@ -59,7 +59,7 @@ trait ErrorHelper
     /**
      * Creates a new instance using formatted message
      */
-    public static function message(string $message, mixed ...$values)
+    public static function message(string $message, mixed ...$values): static
     {
         // intercept variadic previous and code
 
