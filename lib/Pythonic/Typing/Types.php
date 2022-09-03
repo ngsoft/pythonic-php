@@ -20,7 +20,7 @@ final class Types
     static protected array $__all__ = [];
     static protected array $_defined = [];
 
-    public static function boot(): void
+    public static function __boot__(): void
     {
 
         static $booted = false;
@@ -113,7 +113,7 @@ final class Types
     }
 
     /**
-     * Checks if type mathes inputed type
+     * Checks if value matches input type
      */
     public static function checkType(mixed $value, string $type): bool
     {
