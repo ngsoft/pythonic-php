@@ -26,13 +26,13 @@ final class Types
         NotImplementedType::class,
     ];
 
-    static protected array $__all__ = [];
+    static protected array $__mappings__ = [];
     static protected array $__defined__ = [];
 
     public static function __boot__(): void
     {
 
-        if ( ! self::$__all__)
+        if ( ! self::$__mappings__)
         {
 
             foreach (self::BUILTIN_TYPES as $type)
@@ -66,7 +66,7 @@ final class Types
         }
 
 
-        if (in_array($type, self::$__all__))
+        if (in_array($type, self::$__mappings__))
         {
             return;
         }
@@ -75,7 +75,7 @@ final class Types
         [$name, $alias] = [$type::__name__(), $type::__alias__()];
 
         // inserts custom types before builtin types
-        self::$__all__ = [$name => $type] + self::$__all__;
+        self::$__mappings__ = [$name => $type] + self::$__mappings__;
 
         self::$__defined__[$name] = $alias;
 
@@ -92,7 +92,7 @@ final class Types
     {
 
         /** @var Type $type */
-        foreach (self::$__all__ as $type)
+        foreach (self::$__mappings__ as $type)
         {
 
             if ($type::__test__($value))
@@ -110,7 +110,7 @@ final class Types
     public static function checkType(mixed $value, string $type): bool
     {
         $type = self::$__defined__[$type] ?? $type;
-        $type = self::$__all__ [$type] ?? $type;
+        $type = self::$__mappings__ [$type] ?? $type;
 
         if ( ! self::isValidType($type))
         {

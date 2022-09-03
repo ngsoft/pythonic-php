@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-use Pythonic\Typing\NotImplementedType;
-
 define('bool', 'bool');
 define('float', 'float');
 define('int', 'int');
 define('string', 'string');
-define('NoneType', 'NoneType');
-
-define('NotImplemented', NotImplementedType::class);
+define('NoneType', \Pythonic\Typing\NoneType::class);
+define('NotImplemented', \Pythonic\Typing\NotImplementedType::class);
