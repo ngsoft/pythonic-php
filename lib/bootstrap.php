@@ -19,14 +19,14 @@ if ( ! defined('PHP_EXT'))
 }
 
 
-if ( ! function_exists('safe_include'))
+if ( ! function_exists('safe_import'))
 {
 
     /**
      * Include file without overriding globals
      * @phan-suppress PhanImpossibleCondition
      */
-    function safe_include(string $__file__, array $__data__ = []): mixed
+    function safe_import(string $__file__, array $__data__ = []): mixed
     {
         extract($__data__);
 
@@ -86,7 +86,7 @@ try
 
     foreach ($__all__ as $resource)
     {
-        safe_include(getcwd() . DIRECTORY_SEPARATOR . $resource . PHP_EXT);
+        safe_import(getcwd() . DIRECTORY_SEPARATOR . $resource . PHP_EXT);
     }
 } finally
 {
