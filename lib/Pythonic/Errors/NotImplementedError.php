@@ -18,7 +18,7 @@ class NotImplementedError extends RuntimeError
         {
             $class = get_class($class);
         }
-        throw static::message('Method %s must be implemented by %s', $message, $class);
+        throw static::message('Method %s must be implemented by %s', $method, $class);
     }
 
 }
