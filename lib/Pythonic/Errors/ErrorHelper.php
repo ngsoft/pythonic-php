@@ -16,7 +16,7 @@ trait ErrorHelper
     /**
      * Override this to construct message programmatically
      */
-    protected static function __message__(string $message): string
+    public static function __message__(string $message): string
     {
         return $message === '' ? static::$__default__ : $message;
     }
@@ -48,7 +48,7 @@ trait ErrorHelper
     /**
      * Throw error directly
      */
-    public static function raise(string $message, mixed ...$values): never
+    public static function raise(string $message = '', mixed ...$values): never
     {
         throw static::message($message, ...$values);
     }

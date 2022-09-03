@@ -89,9 +89,27 @@ class Importer
     /**
      * imports a resource that can be a function name or class name
      */
-    public static function import(string $resource): string
+    public static function import(string|array $resource, &$as = null): string|array
     {
-        return $this->last = static::instance()->_import($resource);
+        return
+                $as = is_array($resource) ?
+                static::instance()->_importMany($resource) :
+                static::instance()->_import($resource);
+    }
+
+    /**
+     * Returse a tuple of resources
+     */
+    protected function _importMany(array $resources): array
+    {
+
+        if (empty($resources))
+        {
+            ImportError::raise('Cannot import empty resources.');
+        }
+
+
+        $result = [];
     }
 
     /**
