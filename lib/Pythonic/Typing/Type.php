@@ -15,6 +15,9 @@ abstract class Type
         NotInstanciable,
         ClassUtils;
 
+    protected ?string $name = null;
+    protected ?string $alias = null;
+
     /**
      * Get type name
      */
@@ -44,7 +47,7 @@ abstract class Type
      */
     public function name(): string
     {
-        return static::classname();
+        return $this->name ??= static::classname();
     }
 
     /**
@@ -52,7 +55,7 @@ abstract class Type
      */
     public function alias(): string
     {
-        return static::classname();
+        return $this->alias ??= static::classname();
     }
 
     /**
