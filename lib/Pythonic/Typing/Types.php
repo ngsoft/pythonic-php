@@ -42,8 +42,6 @@ final class Types
                 self::register($type);
             }
         }
-
-        var_dump([self::$__mappings__, self::$__defined__]);
     }
 
     protected static function isValidType(string $type): bool
