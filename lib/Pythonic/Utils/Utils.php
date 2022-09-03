@@ -267,4 +267,44 @@ abstract class Utils
         return $cnt;
     }
 
+    /**
+     * Pull value from array like and returns it
+     *
+     * @phan-suppress PhanUnusedVariable, PhanRedundantCondition
+     */
+    public static function pull(ArrayAccess|array &$array, mixed $offset, mixed $default = null): mixed
+    {
+
+        $valid = true;
+
+        if (is_array($array) && ! is_int($offset) && ! is_string($offset))
+        {
+            TypeError::raise('array only accept offsets of type string|int, got %s', get_debug_type($offset));
+        }
+
+
+        try
+        {
+
+            if (is_null($value = $array[$offset] ?? null))
+            {
+                return $default;
+            }
+
+            return $value;
+        }
+        catch (\Throwable)
+        {
+            $valid = false;
+            return $default;
+        }
+        finally
+        {
+            if ($valid)
+            {
+                unset($array[$offset]);
+            }
+        }
+    }
+
 }

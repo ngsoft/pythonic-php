@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pythonic\Traits;
 
+use Pythonic\Utils\Utils,
+    Throwable;
+
 trait ErrorHelper
 {
 
@@ -46,8 +49,6 @@ trait ErrorHelper
      */
     public static function printf(string $message, mixed ...$values): string
     {
-        unset($values['previous'], $values['code']);
-
         if (count($values))
         {
             $message = vsprintf($message, $values);
@@ -61,8 +62,11 @@ trait ErrorHelper
     public static function message(string $message, mixed ...$values)
     {
         // intercept variadic previous and code
-        $prev = $values['previous'] ?? null;
-        $code = $values['code'] ?? 0;
+
+        [$prev, $code] = [Utils::pull($values, 'previous'), Utils::pull($values, 'code', 0)];
+
+        var_dump($prev, $code, $values);
+
         return new static(static::printf($message, ...$values), $code, $prev);
     }
 
@@ -74,10 +78,10 @@ trait ErrorHelper
         throw static::message($message, ...$values);
     }
 
-    public function __construct(string $message = "", int $code = 0, ?\Throwable $previous = null)
+    public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null)
     {
 
-        if ( ! ($this instanceof \Throwable))
+        if ( ! ($this instanceof Throwable))
         {
             return;
         }
