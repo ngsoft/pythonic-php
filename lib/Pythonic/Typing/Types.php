@@ -18,6 +18,7 @@ final class Types
     use NotInstanciable;
 
     static protected array $__all__ = [];
+    static protected array $_defined = [];
 
     public static function boot(): void
     {
@@ -88,6 +89,7 @@ final class Types
         if ( ! defined($name))
         {
             define($name, $type::__alias__());
+            self::$_defined[$name] = constant($name);
         }
     }
 
@@ -123,6 +125,11 @@ final class Types
         }
 
         return $type::__test__($value);
+    }
+
+    public static function getDefined(): array
+    {
+        return self::$_defined;
     }
 
 }

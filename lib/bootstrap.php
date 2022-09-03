@@ -50,5 +50,5 @@ require_once __DIR__ . '/Pythonic/builtin.php';
 
 Pythonic\Typing\Types::boot();
 
-var_dump(Pythonic\Typing\Types::checkType(10, int));
+var_dump(Pythonic\Typing\Types::getDefined());
 

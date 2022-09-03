@@ -15,7 +15,7 @@ abstract class Type
         NotInstanciable,
         ClassUtils;
 
-    protected string $__name__ = '';
+    protected ?string $__name__ = null;
 
     /**
      * Get type name
@@ -46,13 +46,7 @@ abstract class Type
      */
     public function name(): string
     {
-
-        if ($this->__name__ === '')
-        {
-            $this->__name__ = static::classname();
-        }
-
-        return $this->__name__;
+        return $this->__name__ ??= static::classname();
     }
 
     /**
