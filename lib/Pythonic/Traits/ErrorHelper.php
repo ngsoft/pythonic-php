@@ -58,15 +58,13 @@ trait ErrorHelper
 
     /**
      * Creates a new instance using formatted message
+     *
+     * @phan-suppress PhanTypeMismatchReturn
      */
     public static function message(string $message, mixed ...$values): static
     {
         // intercept variadic previous and code
-
         [$prev, $code] = [Utils::pull($values, 'previous'), Utils::pull($values, 'code', 0)];
-
-        var_dump($prev, $code, $values);
-
         return new static(static::printf($message, ...$values), $code, $prev);
     }
 

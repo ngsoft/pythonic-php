@@ -11,9 +11,12 @@ class TypeError extends \TypeError implements PythonicError
 
     use ErrorHelper;
 
+    /**
+     * @phan-suppress PhanPluginAlwaysReturnMethod
+     */
     public static function raiseArgumentCountError(string $resource, int $expected, int $len): never
     {
-        throw static::message('%s expected %d, got %s', $resource, $expected, $len);
+        static::raise('%s expected %d, got %s', $resource, $expected, $len);
     }
 
 }
