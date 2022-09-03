@@ -22,23 +22,28 @@ if ( ! defined('PHP_EXT'))
 if ( ! function_exists('safe_include'))
 {
 
+    /**
+     * Include file without overriding globals
+     * @phan-suppress PhanImpossibleCondition
+     */
     function safe_include(string $__file__, array $__data__ = []): mixed
     {
         extract($__data__);
 
+        $__all__ = $__name__ = null;
+
         $result = require_once $__file__;
 
-        if (isset($__name__))
+        if (isset($__all__) && isset($__name__))
         {
-            Importer::alias($__name__);
+            foreach ((array) $__all__ as $resource)
+            {
+
+                Importer::alias($resource, sprintf('%s.%s', $__name__, $resource));
+            }
         }
 
-        if (isset($__all__))
-        {
-            return $__all__;
-        }
-
-        return $result;
+        return $__all__ ?? $result;
     }
 
 }
@@ -75,8 +80,8 @@ if ( ! function_exists('from'))
 
 try
 {
-
     $pwd = getcwd();
+
     chdir(__DIR__ . '/Pythonic');
 
     foreach ($__all__ as $resource)
@@ -85,7 +90,10 @@ try
     }
 } finally
 {
-    chdir($pwd);
+    if (isset($pwd))
+    {
+        chdir($pwd);
+    }
 }
 
 

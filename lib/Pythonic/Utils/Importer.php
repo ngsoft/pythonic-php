@@ -51,11 +51,13 @@ class Importer
     /**
      * Alias a namespace
      */
-    public static function alias(string $to, string $from = ''): void
+    public static function alias(string $to, string $from): void
     {
-        if ($from === '')
+
+
+        if ($from === $to)
         {
-            $from = 'pythonic.' . $to;
+            return;
         }
 
         static::$_aliases[self::convertToPythonic($to)] = self::convertToPythonic($from);
@@ -74,7 +76,7 @@ class Importer
     {
         $self = static::instance();
 
-        $self->from = $namespace === '' ? null : static::getAlias($namespace);
+        $self->from = $namespace === '' ? null : $namespace;
 
         return $self;
     }
@@ -149,7 +151,7 @@ class Importer
              */
             foreach (['', 'pythonic.'] as $prefix)
             {
-                $php = static::convertToPhp($prefix . $resource);
+                $php = static::convertToPhp(static::getAlias($prefix . $resource));
 
                 if (function_exists($php))
                 {
