@@ -31,6 +31,12 @@ class Importer
      */
     protected ?string $from = null;
 
+    /**
+     * Last import
+     * @var string|null
+     */
+    protected ?string $last = null;
+
     protected static function convertToPythonic(string $namespace): string
     {
         $namespace = trim($namespace, '.\\');
@@ -85,7 +91,7 @@ class Importer
      */
     public static function import(string $resource): string
     {
-        return static::instance()->_import($resource);
+        return $this->last = static::instance()->_import($resource);
     }
 
     /**
@@ -133,6 +139,11 @@ class Importer
         }
 
         return ImportError::raise('Cannot find module: %s', $resource);
+    }
+
+    protected function _as(&$resource): void
+    {
+        $resource = $this->last;
     }
 
 }
