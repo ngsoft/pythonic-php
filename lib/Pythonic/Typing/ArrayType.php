@@ -7,7 +7,7 @@ namespace Pythonic\Typing;
 class ArrayType extends Type
 {
 
-    public function alias(): string
+    public function name(): string
     {
         return 'array';
     }

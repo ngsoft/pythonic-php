@@ -23,7 +23,7 @@ abstract class Type
      */
     public static function __name__(): string
     {
-        return static::instance()->name();
+        return static::instance()->__name__ ??= static::instance()->name();
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class Type
      */
     public function name(): string
     {
-        return $this->__name__ ??= static::classname();
+        return static::classname();
     }
 
     /**
@@ -55,7 +55,7 @@ abstract class Type
      */
     public function alias(): string
     {
-        return static::class();
+        return static::classname();
     }
 
     /**

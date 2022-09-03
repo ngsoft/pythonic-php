@@ -42,6 +42,8 @@ final class Types
                 self::register($type);
             }
         }
+
+        var_dump([self::$__mappings__, self::$__defined__]);
     }
 
     protected static function isValidType(string $type): bool
@@ -79,11 +81,11 @@ final class Types
         // inserts custom types before builtin types
         self::$__mappings__ = [$name => $type] + self::$__mappings__;
 
-        self::$__defined__[$name] = $alias;
+        self::$__defined__[$alias] = $name;
 
-        if ( ! defined($name))
+        if ( ! defined($alias))
         {
-            define($name, $alias);
+            define($alias, $name);
         }
     }
 
