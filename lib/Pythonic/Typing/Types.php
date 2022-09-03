@@ -8,9 +8,7 @@ use Pythonic\{
     Errors\TypeError, Traits\NotInstanciable
 };
 use ReflectionClass;
-use const NAMESPACE_SEPARATOR;
-use function get_debug_type,
-             str_ends_with;
+use function get_debug_type;
 
 final class Types
 {
@@ -29,26 +27,19 @@ final class Types
     ];
 
     static protected array $__all__ = [];
-    static protected array $__defined__ = [
-    ];
+    static protected array $__defined__ = [];
 
     public static function __boot__(): void
     {
 
-        static $booted = false;
-
-        if ( ! $booted)
+        if ( ! self::$__all__)
         {
-            $booted = true;
 
             foreach (self::BUILTIN_TYPES as $type)
             {
                 self::register($type);
             }
         }
-
-
-        var_dump(self::$__all__, self::$__defined__);
     }
 
     protected static function isValidType(string $type): bool
@@ -118,6 +109,7 @@ final class Types
      */
     public static function checkType(mixed $value, string $type): bool
     {
+        $type = self::$__defined__[$type] ?? $type;
         $type = self::$__all__ [$type] ?? $type;
 
         if ( ! self::isValidType($type))

@@ -44,10 +44,6 @@ function len(mixed $countable): int
  */
 function issubclass(mixed $object, string ...$types): bool
 {
-    if (empty($types))
-    {
-        throw new InvalidArgumentException('At least one type is required.');
-    }
     if ( ! is_object($object))
     {
         return false;
@@ -93,7 +89,7 @@ function isinstance(mixed $object, string ...$types): bool
         }
 
 
-        if (uses_trait($object, $type))
+        if (Utils\Utils::uses_trait($object, $type))
         {
             return true;
         }

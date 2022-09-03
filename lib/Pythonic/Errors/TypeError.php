@@ -11,7 +11,7 @@ class TypeError extends \TypeError implements PythonicError
 
     public static function raiseArgumentCountError(string $resource, int $expected, int $len): never
     {
-        static::raise('%s expected %d, got %s', $resource, $expected, $len);
+        throw static::message('%s expected %d, got %s', $resource, $expected, $len);
     }
 
 }
