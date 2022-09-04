@@ -79,11 +79,13 @@ final class Types
         // inserts custom types before builtin types
         self::$__mappings__ = [$name => $type] + self::$__mappings__;
 
-        self::$__defined__[$alias] = $name;
-
-        if ( ! defined($alias))
+        foreach ((array) $alias as $alias)
         {
-            define($alias, $name);
+            self::$__defined__[$alias] = $name;
+            if ( ! defined($alias))
+            {
+                define($alias, $name);
+            }
         }
     }
 

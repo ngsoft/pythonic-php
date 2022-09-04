@@ -37,7 +37,7 @@ abstract class Type
     /**
      * Alias to use for Type constant
      */
-    public static function __alias__(): string
+    public static function __alias__(): string|array
     {
         return static::instance()->alias();
     }
@@ -53,7 +53,7 @@ abstract class Type
     /**
      * get aliased name
      */
-    public function alias(): string
+    public function alias(): string|array
     {
         return $this->alias ??= static::classname();
     }
