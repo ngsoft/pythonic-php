@@ -40,7 +40,7 @@ trait Singleton
 
         $class = static::$__class__ ?? static::class;
 
-        if (trait_exists($class) || interface_exists($class))
+        if (trait_exists($class) || interface_exists($class) || ! class_exists($class))
         {
             RuntimeError::raise('Cannot instanciate %s.', $class);
         }

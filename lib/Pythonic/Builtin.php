@@ -32,7 +32,11 @@ function import(string|array $resource, &$as = null, ?string $from = null): stri
 function len(mixed $countable): int
 {
 
-    if ( ! is_countable($countable))
+    if (is_string($countable))
+    {
+        return $countable === '' ? 0 : mb_strlen($countable);
+    }
+    elseif ( ! is_countable($countable))
     {
         TypeError::raise('object of type %s has no len()', get_debug_type($countable));
     }
@@ -106,4 +110,12 @@ function isinstance(mixed $object, string ...$types): bool
     }
 
     return false;
+}
+
+/**
+ * Returns True if a '_sunder_' name, False otherwise.
+ */
+function is_sunder(string $name): bool
+{
+    return len($name) > 2 && str_starts_with($name, '_') && str_ends_with($name, '_');
 }
