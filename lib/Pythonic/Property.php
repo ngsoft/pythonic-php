@@ -7,6 +7,7 @@ namespace Pythonic;
 use Attribute,
     Closure,
     Pythonic\Errors\TypeError,
+    ReflectionClass,
     ReflectionException,
     ReflectionFunction,
     ReflectionMethod;
@@ -16,7 +17,7 @@ use function array_is_list;
 /**
  * The python property
  * use this as attribute to retain "@property"
- * this can also be uses inside your constructor for protected or lower properties
+ * this can also be used inside your constructor for protected or lower properties
  * eg: $this->prop = new Property('getProp', 'setProp')
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -27,10 +28,66 @@ class Property
     protected $fset = None;
     protected $fdel = None;
 
+    /**
+     * Scan for all attributes and return type for class and returns instances
+     */
+    public static function of(string|object $class): array
+    {
+
+        if ( ! is_string($class))
+        {
+            $class = get_class($class);
+        }
+
+        if ( ! class_exists($class))
+        {
+            TypeError::raise('invalid class %s', $class);
+        }
+
+
+        $instances = [];
+
+        //we only fetch protected properties (public cannot be overridden with __get, __set, __unset)
+
+        /** @var \ReflectionProperty $reflector */
+        foreach ((new ReflectionClass($class))->getProperties() as $reflector)
+        {
+
+            $name = $reflector->getName();
+
+            if ( ! $reflector->isProtected())
+            {
+                continue;
+            }
+
+            // we check for attribute first
+            /** @var \ReflectionAttribute $attribute */
+            foreach ($reflector->getAttributes() as $attribute)
+            {
+                if ($attribute->getName() === __CLASS__)
+                {
+                    $instances[$name] = $attribute->newInstance();
+                    continue 2;
+                }
+            }
+
+            // we check return type is exactly __CLASS__
+            // not nullable and not union/intersection: those ones are to be implemented in the constructor
+
+            if ($reflector->hasType() && ! $reflector->hasDefaultValue() && (string) $reflector->getType() === __CLASS__)
+            {
+                // getter, setter, deleter are to be set
+                $instances[$name] = new static(isAttribute: false);
+            }
+        }
+        return $instances;
+    }
+
     public function __construct(
             $fget = None,
             $fset = None,
             $fdel = None,
+            public readonly bool $isAttribute = true
     )
     {
 
@@ -58,7 +115,7 @@ class Property
     }
 
     /**
-     * @phan-suppress PhanPluginAlwaysReturnMethod
+     * @phan-suppress PhanPluginAlwaysReturnMethod, PhanPossiblyUndeclaredVariable
      */
     protected function get_callable(object|string $obj, array|string|Closure $callable): ReflectionFunction|ReflectionMethod
     {
@@ -94,7 +151,7 @@ class Property
         }
     }
 
-    public function __get__(object|string $obj): mixed
+    public function __get__(object $obj): mixed
     {
 
         if ( ! $this->fget)
@@ -111,14 +168,13 @@ class Property
         return $callable->invoke();
     }
 
-    public function __set__(object|string $obj, mixed $value): void
+    public function __set__(object $obj, mixed $value): void
     {
 
         if ( ! $this->fset)
         {
             return;
         }
-
 
         $callable = $this->get_callable($obj, $this->fset);
 
@@ -133,7 +189,7 @@ class Property
         }
     }
 
-    public function __delete__(object|string $obj): void
+    public function __delete__(object $obj): void
     {
 
         if ( ! $this->fdel)

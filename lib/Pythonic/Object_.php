@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
+use ArrayAccess;
+use const None;
+
 /**
  * The base python object
  * All Pythonic classes extends this one
@@ -14,7 +17,7 @@ class Object_
 {
 
     protected ?string $__doc__ = None;
-    protected array|\ArrayAccess $__dict__ = [];
+    protected array|ArrayAccess $__dict__ = [];
     protected string $__module__ = '';
 
     public function __construct()
@@ -23,6 +26,23 @@ class Object_
         if (static::class === __CLASS__)
         {
             return;
+        }
+
+        /** @var Property $instance */
+        foreach (Property::of($this) as $prop => $instance)
+        {
+            // add dynamic properties
+            if ($instance->isAttribute)
+            {
+                $this->__dict__[$prop] = $instance;
+                continue;
+            }
+
+            // instanciate properties if not already
+            if ( ! isset($this->{$prop}))
+            {
+                $this->{$prop} = $instance;
+            }
         }
     }
 
