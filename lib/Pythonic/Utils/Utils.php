@@ -229,7 +229,7 @@ abstract class Utils
         }
 
         // ArrayAccess&Countable
-        for ($offset = 0; $offset < count($value); $offset ++)
+        for ($offset = 0; $offset < count($value); $offset ++ )
         {
 
             try
