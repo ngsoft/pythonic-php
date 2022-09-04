@@ -36,3 +36,8 @@ define('NotImplemented', 'NotImplementedType');
  * The array type
  */
 define('ArrayType', 'array');
+/**
+ * The base pythonic Object_ type
+ * is_object($obj) !== isinstance($obj, object)
+ */
+define('object', 'object');

@@ -16,6 +16,8 @@ final class Types
     use NotInstanciable;
 
     private const BUILTIN_TYPES = [
+        // pythonic
+        ObjectType::class,
         // php compat
         ArrayType::class,
         // primitives
