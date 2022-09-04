@@ -20,7 +20,7 @@ use function array_is_list;
  * this can also be used inside your constructor for protected or lower properties
  * eg: $this->prop = new Property('getProp', 'setProp')
  */
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD)]
 class Property
 {
 
@@ -47,18 +47,13 @@ class Property
 
         $instances = [];
 
-        //we only fetch protected properties (public cannot be overridden with __get, __set, __unset)
+        $reflClass = new ReflectionClass($class);
 
         /** @var \ReflectionProperty $reflector */
-        foreach ((new ReflectionClass($class))->getProperties() as $reflector)
+        foreach ($reflClass->getProperties() as $reflector)
         {
 
             $name = $reflector->getName();
-
-            if ( ! $reflector->isProtected())
-            {
-                continue;
-            }
 
             // we check for attribute first
             /** @var \ReflectionAttribute $attribute */
@@ -71,6 +66,14 @@ class Property
                 }
             }
 
+
+
+            if ($reflector->isPrivate())
+            {
+                continue;
+            }
+
+
             // we check return type is exactly __CLASS__
             // not nullable and not union/intersection: those ones are to be implemented in the constructor
 
@@ -80,6 +83,37 @@ class Property
                 $instances[$name] = new static(isAttribute: false);
             }
         }
+
+
+        // transform a method as a getter
+
+        /** @var \ReflectionMethod $reflector */
+        foreach ($reflClass->getMethods() as $reflector)
+        {
+
+            $name = $reflector->getName();
+
+            foreach ($reflector->getAttributes() as $attribute)
+            {
+                if ($attribute->getName() === __CLASS__)
+                {
+                    $instance = $attribute->newInstance();
+
+                    if ( ! $instance->fget)
+                    {
+                        $instance->getter($name);
+                    }
+
+                    $instances[$name] = $instance;
+
+                    break;
+                }
+            }
+        }
+
+
+
+
         return $instances;
     }
 
@@ -87,6 +121,7 @@ class Property
             $fget = None,
             $fset = None,
             $fdel = None,
+            public readonly string $name = '',
             public readonly bool $isAttribute = true
     )
     {
