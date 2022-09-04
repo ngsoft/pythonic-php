@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Pythonic;
 
 use Pythonic\{
-    Errors\TypeError, Typing\Types, Utils\Importer, Utils\Utils
+    Errors\TypeError, Typing\Types, Utils\Importer, Utils\StrUtils, Utils\Utils
 };
-use function get_debug_type;
+use function get_debug_type,
+             str_ends_with,
+             str_starts_with;
 
 /**
  * Replaces the python from keyword
@@ -34,7 +36,7 @@ function len(mixed $countable): int
 
     if (is_string($countable))
     {
-        return $countable === '' ? 0 : mb_strlen($countable);
+        return StrUtils::len($countable);
     }
     elseif ( ! is_countable($countable))
     {
@@ -115,7 +117,25 @@ function isinstance(mixed $object, string ...$types): bool
 /**
  * Returns True if a '_sunder_' name, False otherwise.
  */
-function is_sunder(string $name): bool
+function is_sunder(string $value): bool
 {
-    return len($name) > 2 && str_starts_with($name, '_') && str_ends_with($name, '_');
+    return
+            len($value) > 2 &&
+            $value[0] === '_' &&
+            $value[1] !== '_' &&
+            $value[-1] === '_' &&
+            $value[-2] !== '_';
+}
+
+/**
+ * Returns True if a '__dunder__' name, False otherwise.
+ */
+function is_dunder(string $value): bool
+{
+    return
+            len($value) > 4 &&
+            $value[0] . $value[1] === '__' &&
+            $value[-1] . $value[-2] === '__' &&
+            $value[2] !== '_' &&
+            $value[-3] !== '_';
 }
