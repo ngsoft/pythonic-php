@@ -229,7 +229,7 @@ abstract class Utils
         }
 
         // ArrayAccess&Countable
-        for ($offset = 0; $offset < count($value); $offset ++)
+        for ($offset = 0; $offset < count($value); $offset ++ )
         {
 
             try
@@ -305,6 +305,14 @@ abstract class Utils
                 unset($array[$offset]);
             }
         }
+    }
+
+    /**
+     * Get user defined constants
+     */
+    public static function getUserDefinedConstants(): array
+    {
+        return get_defined_constants(true)['user'] ?? [];
     }
 
 }
