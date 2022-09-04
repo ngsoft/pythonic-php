@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Pythonic\Utils;
 
-use Pythonic\Errors\{
-    IndexError, ValueError
-};
-use Stringable;
+use Pythonic\Errors\ValueError,
+    Stringable;
 
 /**
  * Basic Str operations
@@ -39,15 +37,8 @@ abstract class StrUtils
 
         if ( ! Utils::in_range($pos, -$len, $len - 1))
         {
-            IndexError::raiseInvalidOffset($pos, $len - 1, -$len);
+            return '';
         }
-
-
-        if ($pos < 0)
-        {
-            $pos += $len;
-        }
-
 
         return mb_substr($str, $pos, 1);
     }
@@ -93,12 +84,10 @@ abstract class StrUtils
 
 
         // invalid range
-        if ($step > 0 ? $stop <= $start : $stop >= $start)
+        if ($stop === $start || $step > 0 ? $stop < $start : $stop > $start)
         {
             return '';
         }
-
-
 
         //count steps
         [$min, $max] = $start > $stop ? [$stop, $start] : [$start, $stop];

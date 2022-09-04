@@ -18,8 +18,6 @@ if ( ! defined('None'))
     define('None', null);
 }
 
-
-
 require_once __DIR__ . '/Pythonic/Builtin.php';
 
 Types::__boot__();

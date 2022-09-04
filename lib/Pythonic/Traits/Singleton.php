@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Pythonic\Traits;
 
-use Pythonic\Errors\{
-    NotImplementedError, RuntimeError
+use Pythonic\{
+    Errors\NotImplementedError, Errors\RuntimeError, Utils\StrUtils
 };
 use ReflectionException,
     ReflectionMethod;
+use function Pythonic\is_dunder;
 
 /**
  * Use Singleton/Facade antipattern to call instances methods statically
@@ -74,7 +75,7 @@ trait Singleton
     public static function __callStatic(string $name, array $arguments): mixed
     {
         // call $class::__method__ as $class::instance()->method()
-        return static::executeMethod(static::instance(), preg_replace('#^_+(.+[^_])_+$#', '$1', $name), $arguments);
+        return static::executeMethod(static::instance(), is_dunder($name) ? StrUtils::slice($name, 2, -2) : $name, $arguments);
     }
 
 }

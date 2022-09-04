@@ -7,9 +7,7 @@ namespace Pythonic;
 use Pythonic\{
     Errors\TypeError, Typing\Types, Utils\Importer, Utils\StrUtils, Utils\Utils
 };
-use function get_debug_type,
-             str_ends_with,
-             str_starts_with;
+use function get_debug_type;
 
 /**
  * Replaces the python from keyword
@@ -117,25 +115,27 @@ function isinstance(mixed $object, string ...$types): bool
 /**
  * Returns True if a '_sunder_' name, False otherwise.
  */
-function is_sunder(string $value): bool
+function is_sunder(mixed $value): bool
 {
+    $value = Utils::strval($value);
     return
             len($value) > 2 &&
-            $value[0] === '_' &&
-            $value[1] !== '_' &&
-            $value[-1] === '_' &&
-            $value[-2] !== '_';
+            mb_substr($value, 0, 1) === '_' &&
+            mb_substr($value, -1) === '_' &&
+            mb_substr($value, 1, 1) !== '_' &&
+            mb_substr($value, -2, 1) !== '_';
 }
 
 /**
  * Returns True if a '__dunder__' name, False otherwise.
  */
-function is_dunder(string $value): bool
+function is_dunder(mixed $value): bool
 {
+    $value = Utils::strval($value);
     return
             len($value) > 4 &&
-            $value[0] . $value[1] === '__' &&
-            $value[-1] . $value[-2] === '__' &&
-            $value[2] !== '_' &&
-            $value[-3] !== '_';
+            mb_substr($value, 0, 2) === '__' &&
+            mb_substr($value, -2) === '__' &&
+            mb_substr($value, 2, 1) !== '_' &&
+            mb_substr($value, -3, 1) !== '_';
 }
