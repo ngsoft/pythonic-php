@@ -23,7 +23,7 @@ abstract class Utils
      */
     public static function uses_trait(string|object $class, string $trait): bool
     {
-        return in_array($trait, static::class_uses_recursive($class));
+        return trait_exists($trait) && in_array($trait, static::class_uses_recursive($class));
     }
 
     /**
@@ -229,7 +229,7 @@ abstract class Utils
         }
 
         // ArrayAccess&Countable
-        for ($offset = 0; $offset < count($value); $offset ++ )
+        for ($offset = 0; $offset < count($value); $offset ++)
         {
 
             try

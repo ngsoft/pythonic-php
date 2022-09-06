@@ -98,7 +98,8 @@ class Importer
                     $as = is_array($resource) ?
                     static::instance()->importMany($resource) :
                     static::instance()->importSingle($resource);
-        } finally
+        }
+        finally
         {
             static::instance()->from = null;
         }
@@ -156,18 +157,20 @@ class Importer
                 {
                     // get the cased name and caches the result
                     return static::$_cache[$resource] = (new ReflectionFunction($php))->getName();
-                } elseif (class_exists($php))
+                }
+                elseif (class_exists($php))
                 {
                     // get the cased name and caches the result
                     return static::$_cache[$resource] = (new ReflectionClass($php))->getName();
                 }
             }
-        } catch (ReflectionException)
+        }
+        catch (ReflectionException)
         {
             // do nothing
         }
 
-        return ImportError::raise('Cannot find module: %s', $resource);
+        ImportError::raise('Cannot find module: %s', $resource);
     }
 
 }
