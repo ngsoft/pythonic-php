@@ -13,9 +13,6 @@ trait ErrorHelper
     use ClassUtils;
 
     /**
-     * Default error message
-     * Overrides this to change it
-     *
      * @var string[]
      */
     protected static array $__default__ = [];
