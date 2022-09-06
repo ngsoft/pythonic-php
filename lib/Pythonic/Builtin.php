@@ -64,7 +64,7 @@ function isinstance(mixed $object, string ...$types): bool
 
     if (count($types) === 0)
     {
-        TypeError::raiseArgumentCountError('isinstance', 2, 1);
+        TypeError::raiseArgumentCountError(__FUNCTION__, 2, 1);
     }
 
 
@@ -91,7 +91,7 @@ function isinstance(mixed $object, string ...$types): bool
             continue;
         }
 
-        if ( ! class_exists($type) && interface_exists($type) && ! trait_exists($type))
+        if ( ! class_exists($type) && ! interface_exists($type) && ! trait_exists($type))
         {
             continue;
         }
