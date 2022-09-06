@@ -61,7 +61,16 @@ class Property
             {
                 if ($attribute->getName() === __CLASS__)
                 {
-                    $instances[$name] = $attribute->newInstance();
+
+
+                    $prop = $attribute->newInstance();
+
+                    if ($prop->name !== '')
+                    {
+                        $name = $prop->name;
+                    }
+
+                    $instances[$name] = $prop;
                     continue 2;
                 }
             }
@@ -80,7 +89,14 @@ class Property
             if ($reflector->hasType() && ! $reflector->hasDefaultValue() && (string) $reflector->getType() === __CLASS__)
             {
                 // getter, setter, deleter are to be set
-                $instances[$name] = new static(isAttribute: false);
+                $prop = new static(isAttribute: false);
+
+                if ($prop->name !== '')
+                {
+                    $name = $prop->name;
+                }
+
+                $instances[$name] = $prop;
             }
         }
 
@@ -91,7 +107,7 @@ class Property
         foreach ($reflClass->getMethods() as $reflector)
         {
 
-            $name = $reflector->getName();
+            $method = $name = $reflector->getName();
 
             foreach ($reflector->getAttributes() as $attribute)
             {
@@ -101,7 +117,12 @@ class Property
 
                     if ( ! $instance->fget)
                     {
-                        $instance->getter($name);
+                        $instance->getter($method);
+                    }
+
+                    if ($instance->name !== '')
+                    {
+                        $name = $instance->name;
                     }
 
                     $instances[$name] = $instance;
@@ -110,9 +131,6 @@ class Property
                 }
             }
         }
-
-
-
 
         return $instances;
     }

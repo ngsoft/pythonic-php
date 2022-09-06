@@ -16,9 +16,7 @@ use const None;
 class Object_
 {
 
-    protected ?string $__doc__ = None;
     protected array|ArrayAccess $__dict__ = [];
-    protected string $__module__ = '';
 
     public function __construct()
     {
