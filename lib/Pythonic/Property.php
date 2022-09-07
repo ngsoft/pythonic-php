@@ -6,7 +6,7 @@ namespace Pythonic;
 
 use Attribute;
 use Pythonic\{
-    Errors\TypeError, Utils\AttributeReader
+    Errors\TypeError, Utils\AttributeReader, Utils\Reflection
 };
 use const None;
 
@@ -28,7 +28,7 @@ class Property
     /**
      * Scan for all attributes and return type for class and returns instances
      */
-    public static function of(string|object $class): array
+    public static function of(object $class): array
     {
 
 
@@ -41,11 +41,32 @@ class Property
             $instances[$name] ??= $attr;
         }
 
+        foreach (AttributeReader::getMethodAttributes($class, __CLASS__) as $method => $attr)
+        {
 
+            $attr->setName($name = $attr->getName() ?? $method);
+            $instances[$name] ??= $attr;
+        }
 
+        // reads properties return values and initialize those with exact return type
 
+        /** @var \ReflectionProperty $reflectionProperty */
+        foreach (Reflection::getProperties($class) as $reflectionProperty)
+        {
 
-
+            if (
+                    $reflectionProperty->hasType() &&
+                    ! $reflectionProperty->hasDefaultValue() &&
+                    (string) $reflectionProperty->getType() === __CLASS__ &&
+                    ! $reflectionProperty->isInitialized($class)
+            )
+            {
+                $name = $reflectionProperty->getName();
+                $instance = new static(name: $name);
+                $instances[$name] ??= $instance;
+                $reflectionProperty->setValue($class, $instance);
+            }
+        }
 
 
 
@@ -132,7 +153,7 @@ class Property
             return;
         }
 
-        call_user_func($this->get_callable($obj, $this->fset), $value);
+        call_user_func($this->getCallable($obj, $this->fset), $value);
     }
 
     public function __delete__(object $obj): void
@@ -143,7 +164,7 @@ class Property
             return;
         }
 
-        call_user_func($this->get_callable($obj, $this->fdel));
+        call_user_func($this->getCallable($obj, $this->fdel));
     }
 
 }
