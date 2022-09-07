@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
-use Attribute,
-    Closure,
-    Pythonic\Errors\TypeError,
-    ReflectionClass,
-    ReflectionException,
-    ReflectionFunction,
-    ReflectionMethod;
+use Attribute;
+use Pythonic\{
+    Errors\TypeError, Utils\AttributeReader
+};
 use const None;
-use function array_is_list;
 
 /**
  * The python property
@@ -35,113 +31,35 @@ class Property
     public static function of(string|object $class): array
     {
 
-        if ( ! is_string($class))
-        {
-            $class = get_class($class);
-        }
-
-        if ( ! class_exists($class))
-        {
-            TypeError::raise('invalid class %s', $class);
-        }
-
 
         $instances = [];
 
-        $reflClass = new ReflectionClass($class);
-
-        /** @var \ReflectionProperty $reflector */
-        foreach ($reflClass->getProperties() as $reflector)
+        /** @var self $attr */
+        foreach (AttributeReader::getPropertyAttributes($class, __CLASS__) as $prop => $attr)
         {
-
-            $name = $reflector->getName();
-
-            // we check for attribute first
-            /** @var \ReflectionAttribute $attribute */
-            foreach ($reflector->getAttributes() as $attribute)
-            {
-                if ($attribute->getName() === __CLASS__)
-                {
-
-
-                    $prop = $attribute->newInstance();
-
-                    if ($prop->name !== '')
-                    {
-                        $name = $prop->name;
-                    }
-
-                    $instances[$name] = $prop;
-                    continue 2;
-                }
-            }
-
-
-
-            if ($reflector->isPrivate())
-            {
-                continue;
-            }
-
-
-            // we check return type is exactly __CLASS__
-            // not nullable and not union/intersection: those ones are to be implemented in the constructor
-
-            if ($reflector->hasType() && ! $reflector->hasDefaultValue() && (string) $reflector->getType() === __CLASS__)
-            {
-                // getter, setter, deleter are to be set
-                $prop = new static(isAttribute: false);
-
-                if ($prop->name !== '')
-                {
-                    $name = $prop->name;
-                }
-
-                $instances[$name] = $prop;
-            }
+            $name = $attr->getName() ?? $prop;
+            $instances[$name] ??= $attr;
         }
 
 
-        // transform a method as a getter
 
-        /** @var \ReflectionMethod $reflector */
-        foreach ($reflClass->getMethods() as $reflector)
-        {
 
-            $method = $name = $reflector->getName();
 
-            foreach ($reflector->getAttributes() as $attribute)
-            {
-                if ($attribute->getName() === __CLASS__)
-                {
-                    $instance = $attribute->newInstance();
-
-                    if ( ! $instance->fget)
-                    {
-                        $instance->getter($method);
-                    }
-
-                    if ($instance->name !== '')
-                    {
-                        $name = $instance->name;
-                    }
-
-                    $instances[$name] = $instance;
-
-                    break;
-                }
-            }
-        }
 
         return $instances;
     }
 
+    /**
+     * @param string|null $fget Getter method name
+     * @param string|null $fset Setter method name
+     * @param string|null $fdel Deleter method name
+     * @param string|null $name Method name
+     */
     public function __construct(
             ?string $fget = None,
             ?string $fset = None,
             ?string $fdel = None,
-            ?string $name = None,
-            public readonly bool $isAttribute = true
+            ?string $name = None
     )
     {
 
@@ -150,6 +68,16 @@ class Property
         $fget && $this->getter($fget);
         $fset && $this->setter($fset);
         $fdel && $this->deleter($fdel);
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
     }
 
     public function getter(string $fget): static

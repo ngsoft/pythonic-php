@@ -71,6 +71,7 @@ abstract class AttributeReader
                     try
                     {
                         $methods[$method] = $reflectionAttribute->newInstance();
+                        break;
                     }
                     catch (\Throwable)
                     {
@@ -95,7 +96,7 @@ abstract class AttributeReader
 
         /** @var \ReflectionProperty $reflectionProperty */
         /** @var \ReflectionAttribute $reflectionAttribute */
-        foreach (Reflection::getMethods($class) as $reflectionProperty)
+        foreach (Reflection::getProperties($class) as $reflectionProperty)
         {
 
 
@@ -113,6 +114,7 @@ abstract class AttributeReader
                     try
                     {
                         $properties[$property] = $reflectionAttribute->newInstance();
+                        break;
                     }
                     catch (\Throwable)
                     {
