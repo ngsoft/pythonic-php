@@ -11,7 +11,7 @@ use Pythonic\Errors\TypeError,
     ReflectionProperty;
 
 /**
- * @phan-file-suppress PhanPluginAlwaysReturnMethod
+ * @phan-file-suppress PhanPluginAlwaysReturnMethod, PhanPossiblyUndeclaredVariable
  */
 abstract class Reflection
 {

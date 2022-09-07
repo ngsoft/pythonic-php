@@ -11,6 +11,9 @@ use ReflectionClass,
     ReflectionException,
     ReflectionFunction;
 
+/**
+ * @phan-file-suppress PhanPluginAlwaysReturnMethod
+ */
 class Importer
 {
 
