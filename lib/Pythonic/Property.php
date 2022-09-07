@@ -37,9 +37,13 @@ class Property
         /** @var self $attr */
         foreach (AttributeReader::getPropertyAttributes($class, __CLASS__) as $prop => $attr)
         {
-            $name = $attr->getName() ?? $prop;
+            $attr->setName($name = $attr->getName() ?? $prop);
             $instances[$name] ??= $attr;
         }
+
+
+
+
 
 
 
