@@ -24,9 +24,10 @@ use function array_is_list;
 class Property
 {
 
-    protected $fget = None;
-    protected $fset = None;
-    protected $fdel = None;
+    protected ?string $fget = None;
+    protected ?string $fset = None;
+    protected ?string $fdel = None;
+    protected ?string $name = None;
 
     /**
      * Scan for all attributes and return type for class and returns instances
@@ -136,10 +137,10 @@ class Property
     }
 
     public function __construct(
-            $fget = None,
-            $fset = None,
-            $fdel = None,
-            public readonly string $name = '',
+            ?string $fget = None,
+            ?string $fset = None,
+            ?string $fdel = None,
+            ?string $name = None,
             public readonly bool $isAttribute = true
     )
     {

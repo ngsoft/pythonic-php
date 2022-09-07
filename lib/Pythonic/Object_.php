@@ -18,12 +18,15 @@ class Object_
 
     protected array|ArrayAccess $__dict__ = [];
 
+    #[Property('getProp')]
+    protected $prop = 10;
+
     public function __construct()
     {
 
         if (static::class === __CLASS__)
         {
-            return;
+            //return;
         }
 
         /** @var Property $instance */
