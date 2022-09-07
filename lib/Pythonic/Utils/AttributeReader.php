@@ -11,4 +11,16 @@ use Pythonic\Errors\TypeError,
 abstract class AttributeReader
 {
 
+    /**
+     * Returns the first named class attribute
+     */
+    public static function getClassAttribute(string|object $class, string $name): ?object
+    {
+
+        foreach (Reflection::getSubClasses($class) as $reflectionClass)
+        {
+
+        }
+    }
+
 }

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Pythonic\Utils;
 
-use Pythonic\{
-    Errors\TypeError, Traits\NotInstanciable
-};
-use ReflectionClass,
+use Pythonic\Errors\TypeError,
+    ReflectionClass,
     ReflectionException,
     ReflectionMethod,
     ReflectionProperty;
@@ -15,10 +13,8 @@ use ReflectionClass,
 /**
  * @phan-file-suppress PhanPluginAlwaysReturnMethod
  */
-final class Reflection
+abstract class Reflection
 {
-
-    use NotInstanciable;
 
     /**
      * Get Reflector for class
@@ -29,21 +25,27 @@ final class Reflection
     public static function getClass(string|object $class): ReflectionClass
     {
 
-        try
+
+        static $cache = [];
+
+        if ( ! is_string($class))
         {
-            if ( ! is_string($class))
+            $class = get_class($class);
+        }
+
+        if ( ! isset($cache[$class]))
+        {
+            try
             {
-                $class = get_class($class);
+                $cache[$class] = new ReflectionClass($class);
             }
-
-            $result = new ReflectionClass($class);
-        }
-        catch (ReflectionException)
-        {
-            TypeError::raise('class %s does not exists.', $class);
+            catch (ReflectionException)
+            {
+                TypeError::raise('class %s does not exists.', $class);
+            }
         }
 
-        return $result;
+        return $cache[$class];
     }
 
     /**
@@ -54,27 +56,35 @@ final class Reflection
      */
     public static function getSubClasses(string|object $class): iterable
     {
+        static $cache = [];
 
-
-        try
+        if ( ! is_string($class))
         {
-            if ( ! is_string($class))
+            $class = get_class($class);
+        }
+
+        $cache[$class] ??= [];
+
+        if ( ! $cache[$class])
+        {
+            try
             {
-                $class = get_class($class);
+
+                $result = &$cache[$class];
+                $parent = $class;
+                while (false !== $parent)
+                {
+                    $result[$parent] = static::getClass($parent);
+                    $parent = get_parent_class($parent);
+                }
             }
-
-
-            while (false !== $class)
+            catch (TypeError | ReflectionException)
             {
-
-                yield $class => static::getClass($class);
-                $class = get_parent_class($class);
+                TypeError::raise('class %s does not exists.', $parent);
             }
         }
-        catch (TypeError | ReflectionException)
-        {
-            TypeError::raise('class %s does not exists.', $class);
-        }
+
+        yield from $cache[$class];
     }
 
     /**
@@ -82,7 +92,6 @@ final class Reflection
      */
     public static function getProperty(string|object $class, string $property): ReflectionProperty
     {
-
 
         if ( ! is_string($class))
         {
@@ -102,6 +111,52 @@ final class Reflection
 
 
         TypeError::raise('class %s does not have property %s.', $class, $property);
+    }
+
+    /**
+     * Get all class and subclasses properties
+     *
+     * @param string|object $class
+     * @return iterable<string, ReflectionProperty>
+     */
+    public static function getProperties(string|object $class): iterable
+    {
+
+        static $cache = [];
+
+        if ( ! is_string($class))
+        {
+            $class = get_class($class);
+        }
+
+
+        $cache[$class] ??= [];
+
+        if ( ! $cache[$class])
+        {
+
+            $properties = &$cache[$class];
+
+            /** @var ReflectionClass $reflectionClass */
+            /** @var ReflectionProperty $reflectionProperty */
+            foreach (static::getSubClasses($class) as $reflectionClass)
+            {
+
+                foreach ($reflectionClass->getProperties() as $reflectionProperty)
+                {
+                    $name = $reflectionProperty->getName();
+                    if (isset($properties[$name]))
+                    {
+                        continue;
+                    }
+
+
+                    $properties[$name] = $reflectionProperty;
+                }
+            }
+        }
+
+        yield from $cache[$class];
     }
 
     /**
@@ -129,6 +184,52 @@ final class Reflection
 
 
         TypeError::raise('class %s does not have method %s.', $class, $method);
+    }
+
+    /**
+     * Get all class and subclasses properties
+     *
+     * @param string|object $class
+     * @return iterable<string, ReflectionMethod>
+     */
+    public static function getMethods(string|object $class): iterable
+    {
+        static $cache = [];
+
+        if ( ! is_string($class))
+        {
+            $class = get_class($class);
+        }
+
+
+        $cache[$class] ??= [];
+
+        if ( ! $cache[$class])
+        {
+
+            $methods = &$cache[$class];
+
+            /** @var ReflectionClass $reflectionClass */
+            /** @var $reflectionMethod $reflectionMethod */
+            foreach (static::getSubClasses($class) as $reflectionClass)
+            {
+
+                foreach ($reflectionClass->getMethods() as $reflectionMethod)
+                {
+                    $name = $reflectionMethod->getName();
+
+                    if (isset($methods[$name]))
+                    {
+                        continue;
+                    }
+
+
+                    $methods[$name] = $reflectionMethod;
+                }
+            }
+        }
+
+        yield from $cache[$class];
     }
 
 }
