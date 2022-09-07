@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
-use ArrayAccess;
-use const None;
+use ArrayAccess,
+    Pythonic\Errors\AttributeError;
 
 /**
  * The base python object
@@ -42,6 +42,8 @@ class Object_
         {
             return $property->__get__($this);
         }
+
+        AttributeError::raise('attribute %s does not exists.', $name);
     }
 
     public function __set(string $name, mixed $value): void
@@ -53,6 +55,8 @@ class Object_
         {
             $property->__set__($this, $value);
         }
+
+        AttributeError::raise('attribute %s does not exists.', $name);
     }
 
     public function __unset(string $name): void
@@ -63,6 +67,13 @@ class Object_
         {
             $property->__delete__($this);
         }
+
+        AttributeError::raise('attribute %s does not exists.', $name);
+    }
+
+    public function __isset(string $name): bool
+    {
+        return ! is_null($this->__dict__[$name] ?? null);
     }
 
 }
