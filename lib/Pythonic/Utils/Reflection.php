@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Pythonic\Utils;
 
-use Pythonic\Errors\TypeError,
-    ReflectionClass,
-    ReflectionException;
+use Pythonic\{
+    Errors\TypeError, Traits\NotInstanciable
+};
+use ReflectionClass,
+    ReflectionException,
+    ReflectionMethod,
+    ReflectionProperty;
 
 /**
  * @phan-file-suppress PhanPluginAlwaysReturnMethod
@@ -14,7 +18,7 @@ use Pythonic\Errors\TypeError,
 final class Reflection
 {
 
-    use \Pythonic\Traits\NotInstanciable;
+    use NotInstanciable;
 
     /**
      * Get Reflector for class
@@ -46,7 +50,7 @@ final class Reflection
      * Get Subclasses of class including itself
      *
      * @param string|object $class
-     * @return ReflectionClass[]
+     * @return iterable<string, ReflectionClass>
      */
     public static function getSubClasses(string|object $class): iterable
     {
@@ -59,11 +63,11 @@ final class Reflection
                 $class = get_class($class);
             }
 
-            $result = [];
 
             while (false !== $class)
             {
-                $result[$class] = static::getClass($class);
+
+                yield $class => static::getClass($class);
                 $class = get_parent_class($class);
             }
         }
@@ -71,14 +75,12 @@ final class Reflection
         {
             TypeError::raise('class %s does not exists.', $class);
         }
-
-        return $result;
     }
 
     /**
      * Get Property
      */
-    public static function getProperty(string|object $class, string $property): \ReflectionProperty
+    public static function getProperty(string|object $class, string $property): ReflectionProperty
     {
 
 
@@ -102,7 +104,10 @@ final class Reflection
         TypeError::raise('class %s does not have property %s.', $class, $property);
     }
 
-    public static function getMethod(string|object $class, string $method): \ReflectionMethod
+    /**
+     * Get Method
+     */
+    public static function getMethod(string|object $class, string $method): ReflectionMethod
     {
 
 
