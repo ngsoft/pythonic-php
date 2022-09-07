@@ -145,64 +145,41 @@ class Property
     )
     {
 
+        $this->name = $name;
+
         $fget && $this->getter($fget);
         $fset && $this->setter($fset);
         $fdel && $this->deleter($fdel);
     }
 
-    public function getter(array|string|Closure $fget): static
+    public function getter(string $fget): static
     {
         $this->fget = $fget;
         return $this;
     }
 
-    public function setter(array|string|Closure $fset): static
+    public function setter(string $fset): static
     {
         $this->fset = $fset;
         return $this;
     }
 
-    public function deleter(array|string|Closure $fdel): static
+    public function deleter(string $fdel): static
     {
         $this->fdel = $fdel;
         return $this;
     }
 
-    /**
-     * @phan-suppress PhanPluginAlwaysReturnMethod, PhanPossiblyUndeclaredVariable
-     */
-    protected function get_callable(object|string $obj, array|string|Closure $callable): ReflectionFunction|ReflectionMethod
+    protected function getCallable(object $obj, string $method): callable
     {
 
-        try
+        $callable = [$obj, $method];
+        if ( ! is_callable($callable))
         {
-            $call = $callable;
-
-            if ($call instanceof Closure)
-            {
-                return new ReflectionFunction($call);
-            }
-
-            if (is_string($call))
-            {
-                $call = [$obj, $call];
-            }
-
-            if ( ! array_is_list($call) || count($call) !== 2)
-            {
-                TypeError::raise('invalid callable');
-            }
-
-            return new ReflectionMethod($call[0], $call[1]);
+            TypeError::raise('object %s method %s is not accessible.', get_class($obj), $method);
         }
-        catch (ReflectionException | TypeError $prev)
-        {
-            TypeError::raise(
-                    'invalid callable %s',
-                    json_encode($call, JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-                    previous: $prev
-            );
-        }
+
+        return $callable;
     }
 
     public function __get__(object $obj): mixed
@@ -212,14 +189,7 @@ class Property
         {
             return None;
         }
-        $callable = $this->get_callable($obj, $this->fget);
-
-        if ($callable instanceof ReflectionMethod)
-        {
-            $callable->setAccessible(true);
-            return $callable->invoke($obj);
-        }
-        return $callable->invoke();
+        return call_user_func($this->getCallable($obj, $this->fget));
     }
 
     public function __set__(object $obj, mixed $value): void
@@ -230,17 +200,7 @@ class Property
             return;
         }
 
-        $callable = $this->get_callable($obj, $this->fset);
-
-        if ($callable instanceof ReflectionMethod)
-        {
-            $callable->setAccessible(true);
-            $callable->invoke($obj, $value);
-        }
-        else
-        {
-            $callable->invoke($value);
-        }
+        call_user_func($this->get_callable($obj, $this->fset), $value);
     }
 
     public function __delete__(object $obj): void
@@ -251,17 +211,7 @@ class Property
             return;
         }
 
-        $callable = $this->get_callable($obj, $this->fdel);
-
-        if ($callable instanceof ReflectionMethod)
-        {
-            $callable->setAccessible(true);
-            $callable->invoke($obj);
-        }
-        else
-        {
-            $callable->invoke();
-        }
+        call_user_func($this->get_callable($obj, $this->fdel));
     }
 
 }
