@@ -6,8 +6,10 @@ namespace Pythonic;
 
 use ArrayAccess;
 use Pythonic\{
-    Enums\PHP, Errors\AttributeError, Errors\NotImplementedError
+    Enums\PHP, Errors\AttributeError, Errors\NotImplementedError, Utils\AttributeReader
 };
+use ReflectionClass,
+    ReflectionProperty;
 
 /**
  * The base python object
@@ -20,10 +22,13 @@ class Object_
 
     protected array|ArrayAccess $__dict__ = [];
 
+    /**
+     * @access protected
+     */
     public static function __dir__(object $self): array
     {
 
-        static $hideMethods;
+        static $hideMethods, $cache = [];
 
         $hideMethods ??= PHP::getBuiltinMethods();
 
@@ -32,26 +37,40 @@ class Object_
             NotImplementedError::raise('%s does not implements %s', get_class($self), __CLASS__);
         }
 
+        $class = get_class($self);
 
-
-        $result = [];
-
-        foreach (get_class_methods($self) as $method)
+        if ( ! isset($cache[$class]))
         {
+            $cache[$class] = [];
+            $result = &$cache[$class];
 
-            if (in_array($method, $hideMethods))
+            foreach (get_class_methods($self) as $method)
             {
-                continue;
+
+                if (in_array($method, $hideMethods) && ! AttributeReader::getMethodAttributes($self, IsPythonic::class))
+                {
+                    continue;
+                }
+
+
+                $result[$method] = $method;
+            }
+
+            // public properties
+            /** @var ReflectionProperty $property */
+            foreach ((new ReflectionClass($self))->getProperties(ReflectionProperty::IS_PUBLIC) as $property)
+            {
+
             }
 
 
-            $result[$method] = $method;
+            $result = array_values($result);
         }
 
 
 
 
-        return array_values($result);
+        return $cache[$class];
     }
 
     public function __construct()

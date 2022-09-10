@@ -82,7 +82,7 @@ abstract class AttributeReader
         }
 
 
-        yield from $methods;
+        return $methods;
     }
 
     /**
@@ -125,7 +125,7 @@ abstract class AttributeReader
         }
 
 
-        yield from $properties;
+        return $properties;
     }
 
 }
