@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pythonic;
 
 use Pythonic\{
-    Enums\PHP, Errors\AttributeError, Utils\Reflection
+    Enums\PHP, Errors\AttributeError, Traits\ClassUtils, Utils\AttributeReader, Utils\Reflection
 };
 
 /**
@@ -17,7 +17,7 @@ use Pythonic\{
 class Object_
 {
 
-    use Traits\ClassUtils;
+    use ClassUtils;
 
     /**
      * Reserved slots
@@ -29,14 +29,13 @@ class Object_
     #[Property]
     public function __class__(): string
     {
-
         return $this->__class__ ??= sprintf('<class \'%s\'>', static::class);
     }
 
     /**
      * @return string[]
      */
-    #[IsBuiltin(__CLASS__)]
+    #[IsBuiltin]
     public function __dir__(): iterable
     {
 
@@ -98,7 +97,7 @@ class Object_
         return $cache[$class];
     }
 
-    #[IsBuiltin(__CLASS__)]
+    #[IsBuiltin]
     public function __repr__(): string
     {
         return sprintf('<%s object>', static::classname());
@@ -115,11 +114,8 @@ class Object_
                 AttributeError::raiseForClassAttribute($this, $prop);
             }
 
-
             $this->__dict__[$prop] = $instance;
         }
-
-
 
         if (static::class === __CLASS__)
         {
@@ -130,9 +126,14 @@ class Object_
     protected function getMethodRepr(string $method): string
     {
 
-        if ($attr = Utils\AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
+        if ($method === '__repr__')
         {
-            return sprintf('<built-in method %s of %s object>', $method, $attr->class);
+            return sprintf('<method-wrapper %s of %s object>', $method, static::classname());
+        }
+
+        if ($attr = AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
+        {
+            return sprintf('<built-in method %s of %s object>', $method, static::classname());
         }
 
         return sprintf('<bound method %s::%s of %s>', static::class, $method, $this->__repr__());
