@@ -43,7 +43,7 @@ class Object_
             return $property->__get__($this);
         }
 
-        AttributeError::raise('attribute %s does not exists.', $name);
+        return AttributeError::raise('attribute %s does not exists.', $name);
     }
 
     public function __set(string $name, mixed $value): void

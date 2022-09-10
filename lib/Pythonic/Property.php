@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
-use Attribute;
+use Attribute,
+    Closure;
 use Pythonic\{
     Errors\TypeError, Utils\AttributeReader, Utils\Reflection
 };
-use const None;
 
 /**
  * The python property
@@ -19,11 +19,6 @@ use const None;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD)]
 class Property
 {
-
-    protected ?string $fget = None;
-    protected ?string $fset = None;
-    protected ?string $fdel = None;
-    protected ?string $name = None;
 
     /**
      * Scan for all attributes and return type for class and returns instances
@@ -37,14 +32,20 @@ class Property
         /** @var self $attr */
         foreach (AttributeReader::getPropertyAttributes($class, __CLASS__) as $prop => $attr)
         {
-            $attr->setName($name = $attr->getName() ?? $prop);
+
+            $attr->setName(
+                    $name = $attr->name ?? $prop
+            );
+
             $instances[$name] ??= $attr;
         }
 
         foreach (AttributeReader::getMethodAttributes($class, __CLASS__) as $method => $attr)
         {
 
-            $attr->setName($name = $attr->getName() ?? $method);
+            $attr->setName(
+                    $name = $attr->getName() ?? $method
+            );
             $instances[$name] ??= $attr;
         }
 
@@ -81,18 +82,13 @@ class Property
      * @param string|null $name Method name
      */
     public function __construct(
-            ?string $fget = None,
-            ?string $fset = None,
-            ?string $fdel = None,
-            ?string $name = None
+            protected string|Closure|null $fget = null,
+            protected string|Closure|null $fset = null,
+            protected string|Closure|null $fdel = null,
+            protected ?string $name = null
     )
     {
 
-        $this->name = $name;
-
-        $fget && $this->getter($fget);
-        $fset && $this->setter($fset);
-        $fdel && $this->deleter($fdel);
     }
 
     public function getName(): ?string
@@ -105,28 +101,35 @@ class Property
         $this->name = $name;
     }
 
-    public function getter(string $fget): static
+    public function getter(string|Closure $fget): static
     {
         $this->fget = $fget;
         return $this;
     }
 
-    public function setter(string $fset): static
+    public function setter(string|Closure $fset): static
     {
         $this->fset = $fset;
         return $this;
     }
 
-    public function deleter(string $fdel): static
+    public function deleter(string|Closure $fdel): static
     {
         $this->fdel = $fdel;
         return $this;
     }
 
-    protected function getCallable(object $obj, string $method): callable
+    protected function getCallable(object $obj, string|Closure $method): callable
     {
 
+        if ($method instanceof Closure)
+        {
+            return $method->bindTo($obj);
+        }
+
+
         $callable = [$obj, $method];
+
         if ( ! is_callable($callable))
         {
             TypeError::raise('object %s method %s is not accessible.', get_class($obj), $method);
@@ -140,8 +143,9 @@ class Property
 
         if ( ! $this->fget)
         {
-            return None;
+            return null;
         }
+
         return call_user_func($this->getCallable($obj, $this->fget));
     }
 
