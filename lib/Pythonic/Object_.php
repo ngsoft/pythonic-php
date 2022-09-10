@@ -20,13 +20,21 @@ class Object_
     use ClassUtils;
 
     /**
-     * Reserved slots
+     * Public properties
      */
     protected array $__dict__ = [];
-    protected ?array $__slots__ = null;
+
+    /**
+     * Reserved slots
+     */
+    protected $__slots__ = null;
+
+    /**
+     * __class__() caches
+     */
     protected ?string $__class__ = null;
 
-    #[Property, IsBuiltin]
+    #[Property]
     public function __class__(): string
     {
         return $this->__class__ ??= sprintf('<class \'%s\'>', static::class);
@@ -109,6 +117,13 @@ class Object_
         {
             $this->__dict__[$prop] = $instance;
         }
+
+        // reserve slots, if not already
+        foreach ($this->__slots__ ?? [] as $prop)
+        {
+
+            $this->__dict__[$prop] ??= null;
+        }
     }
 
     protected function getMethodRepr(string $method): string
@@ -147,13 +162,13 @@ class Object_
         {
             return $property->__get__($this);
         }
+        elseif ($this->hasSlot($name) && $this->__isset($name))
+        {
+            return $property;
+        }
         elseif (method_exists($this, $name))
         {
             return $this->getMethodRepr($name);
-        }
-        elseif ($this->hasSlot($name))
-        {
-            return $property;
         }
         else
         {
@@ -170,7 +185,7 @@ class Object_
         {
             $property->__set__($this, $value);
         }
-        elseif ($this->hasSlot($name) && ! method_exists($this, $name))
+        elseif ($this->hasSlot($name))
         {
             $this->__dict__[$name] = $value;
         }
@@ -187,12 +202,10 @@ class Object_
         if ($property instanceof Property)
         {
             $property->__delete__($this);
-            return;
         }
-        elseif ($this->hasSlot($name) && ! method_exists($this, $name))
+        elseif (null !== $property)
         {
             unset($this->__dict__[$name]);
-            return;
         }
         else
         {
@@ -202,7 +215,7 @@ class Object_
 
     public function __isset(string $name): bool
     {
-        return ! is_null($this->__dict__[$name] ?? null);
+        return array_key_exists($name, $this->__dict__);
     }
 
 }
