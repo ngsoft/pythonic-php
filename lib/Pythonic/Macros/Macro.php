@@ -28,7 +28,7 @@ class Macro
     }
 
     /**
-     * Creates multiple callables from a class
+     * Creates multiple instances from an object
      */
     public static function fromObject(object $object): array
     {
@@ -47,11 +47,10 @@ class Macro
             /** @var ReflectionMethod $method */
             foreach ($methods as $method)
             {
-                if ($method->isConstructor() || $method->isDestructor())
+                if ($method->isConstructor() || $method->isDestructor() || $method->isStatic())
                 {
                     continue;
                 }
-
 
                 $name = $method->getName();
 
@@ -62,6 +61,47 @@ class Macro
             }
         }
         catch (ReflectionException $prev)
+        {
+            TypeError::raise('Invalid class %s', $class, previous: $prev);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Creates multiple instances from a class
+     */
+    public static function fromStatic(string|object $class): array
+    {
+
+        $result = [];
+
+        if (is_object($class))
+        {
+            $class = get_class($class);
+        }
+
+
+        try
+        {
+
+            $methods = (new ReflectionClass($class))->getMethods(
+                    ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED | ReflectionMethod::IS_STATIC
+            );
+
+            /** @var ReflectionMethod $method */
+            foreach ($methods as $method)
+            {
+
+                $name = $method->getName();
+
+                if ($closure = $method->getClosure())
+                {
+                    $result[$name] ??= static::fromCallable($closure, $name, true);
+                }
+            }
+        }
+        catch (\ReflectionException $prev)
         {
             TypeError::raise('Invalid class %s', $class, previous: $prev);
         }
