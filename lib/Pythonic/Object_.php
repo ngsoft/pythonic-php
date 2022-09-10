@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
-use ArrayAccess,
-    Pythonic\Errors\AttributeError;
+use ArrayAccess;
+use Pythonic\{
+    Enums\PHP, Errors\AttributeError, Errors\NotImplementedError
+};
 
 /**
  * The base python object
@@ -17,6 +19,40 @@ class Object_
 {
 
     protected array|ArrayAccess $__dict__ = [];
+
+    public static function __dir__(object $self): array
+    {
+
+        static $hideMethods;
+
+        $hideMethods ??= PHP::getBuiltinMethods();
+
+        if ( ! ($self instanceof self))
+        {
+            NotImplementedError::raise('%s does not implements %s', get_class($self), __CLASS__);
+        }
+
+
+
+        $result = [];
+
+        foreach (get_class_methods($self) as $method)
+        {
+
+            if (in_array($method, $hideMethods))
+            {
+                continue;
+            }
+
+
+            $result[$method] = $method;
+        }
+
+
+
+
+        return array_values($result);
+    }
 
     public function __construct()
     {
