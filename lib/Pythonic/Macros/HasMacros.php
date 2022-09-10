@@ -15,6 +15,24 @@ class HasMacros
     protected static array $__macros__ = [];
 
     /**
+     * Mix another object into the class
+     */
+    public static function mixin(object $other, bool $replace = true): void
+    {
+        foreach (Macro::fromObject($other) as $name => $macro)
+        {
+
+            if ($replace)
+            {
+                static::$__macros__[$name] = $macro;
+                continue;
+            }
+
+            static::$__macros__[$name] ??= $macro;
+        }
+    }
+
+    /**
      * Erase all macros
      */
     public static function flushMacros(): void
