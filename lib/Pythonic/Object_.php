@@ -6,10 +6,8 @@ namespace Pythonic;
 
 use ArrayAccess;
 use Pythonic\{
-    Enums\PHP, Errors\AttributeError, Errors\NotImplementedError, Utils\AttributeReader
+    Enums\PHP, Errors\AttributeError, Utils\Reflection
 };
-use ReflectionClass,
-    ReflectionProperty;
 
 /**
  * The base python object
@@ -23,31 +21,33 @@ class Object_
     protected array|ArrayAccess $__dict__ = [];
 
     /**
-     * @access protected
+     *
      */
-    public static function __dir__(object $self): array
+    public function __dir__(): iterable
     {
 
         static $hideMethods, $cache = [];
 
         $hideMethods ??= PHP::getBuiltinMethods();
 
-        if ( ! ($self instanceof self))
-        {
-            NotImplementedError::raise('%s does not implements %s', get_class($self), __CLASS__);
-        }
-
-        $class = get_class($self);
+        $class = get_class($this);
 
         if ( ! isset($cache[$class]))
         {
             $cache[$class] = [];
             $result = &$cache[$class];
 
-            foreach (get_class_methods($self) as $method)
+            foreach (Reflection::getMethods($this) as $reflectionMethod)
             {
 
-                if (in_array($method, $hideMethods) && ! AttributeReader::getMethodAttributes($self, IsPythonic::class))
+                if ( ! $reflectionMethod->isPublic() || $reflectionMethod->isStatic())
+                {
+                    continue;
+                }
+
+                $method = $reflectionMethod->getName();
+
+                if (in_array($method, $hideMethods) && ! $reflectionMethod->getAttributes(IsPythonic::class))
                 {
                     continue;
                 }
@@ -57,10 +57,21 @@ class Object_
             }
 
             // public properties
-            /** @var ReflectionProperty $property */
-            foreach ((new ReflectionClass($self))->getProperties(ReflectionProperty::IS_PUBLIC) as $property)
-            {
 
+            foreach (Reflection::getProperties($this) as $reflectionProperty)
+            {
+                if ( ! $reflectionProperty->isPublic() && ! $reflectionProperty->isStatic())
+                {
+                    continue;
+                }
+
+                $property = $reflectionProperty->getName();
+                $result[$property] = $property;
+            }
+
+            foreach (array_keys($this->__dict__) as $attr)
+            {
+                $result[$attr] = $attr;
             }
 
 

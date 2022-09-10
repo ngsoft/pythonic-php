@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pythonic\Utils;
 
+use Throwable;
+
 abstract class AttributeReader
 {
 
@@ -31,7 +33,7 @@ abstract class AttributeReader
                 }
             }
         }
-        catch (\Throwable)
+        catch (Throwable)
         {
 
         }
@@ -41,9 +43,39 @@ abstract class AttributeReader
     }
 
     /**
+     * Get first named attribute for a class method
+     */
+    public static function getMethodAttribute(string|object $class, string $method, string $attribute): ?object
+    {
+
+        $reflector = Reflection::getMethod($class, $method);
+
+        /** @var \ReflectionAttribute $reflectionAttribute */
+        foreach ($reflector->getAttributes() as $reflectionAttribute)
+        {
+
+            if ($reflectionAttribute->getName() === $attribute)
+            {
+
+                try
+                {
+                    return $reflectionAttribute->newInstance();
+                }
+                catch (Throwable)
+                {
+
+                }
+            }
+        }
+
+
+        return null;
+    }
+
+    /**
      * Get all methods first named attribute
      */
-    public static function getMethodAttributes(string|object $class, string $attribute): iterable
+    public static function getMethodsAttributes(string|object $class, string $attribute): iterable
     {
 
 
@@ -73,7 +105,7 @@ abstract class AttributeReader
                         $methods[$method] = $reflectionAttribute->newInstance();
                         break;
                     }
-                    catch (\Throwable)
+                    catch (Throwable)
                     {
 
                     }
@@ -86,9 +118,39 @@ abstract class AttributeReader
     }
 
     /**
+     * Get first named attribute for a class property
+     */
+    public static function getPropertyAttribute(string|object $class, string $property, string $attribute): ?object
+    {
+
+        $reflector = Reflection::getProperty($class, $property);
+
+        /** @var \ReflectionAttribute $reflectionAttribute */
+        foreach ($reflector->getAttributes() as $reflectionAttribute)
+        {
+
+            if ($reflectionAttribute->getName() === $attribute)
+            {
+
+                try
+                {
+                    return $reflectionAttribute->newInstance();
+                }
+                catch (Throwable)
+                {
+
+                }
+            }
+        }
+
+
+        return null;
+    }
+
+    /**
      * Get all properties first named attribute
      */
-    public static function getPropertyAttributes(string|object $class, string $attribute): iterable
+    public static function getPropertiesAttributes(string|object $class, string $attribute): iterable
     {
 
 
@@ -116,7 +178,7 @@ abstract class AttributeReader
                         $properties[$property] = $reflectionAttribute->newInstance();
                         break;
                     }
-                    catch (\Throwable)
+                    catch (Throwable)
                     {
 
                     }

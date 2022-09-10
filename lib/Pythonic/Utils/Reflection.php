@@ -52,9 +52,9 @@ abstract class Reflection
      * Get Subclasses of class including itself
      *
      * @param string|object $class
-     * @return iterable<string, ReflectionClass>
+     * @return ReflectionClass[]
      */
-    public static function getSubClasses(string|object $class): iterable
+    public static function getSubClasses(string|object $class)
     {
         static $cache = [];
 
@@ -84,7 +84,7 @@ abstract class Reflection
             }
         }
 
-        yield from $cache[$class];
+        return $cache[$class];
     }
 
     /**
@@ -117,9 +117,9 @@ abstract class Reflection
      * Get all class and subclasses properties
      *
      * @param string|object $class
-     * @return iterable<string, ReflectionProperty>
+     * @return ReflectionProperty[]
      */
-    public static function getProperties(string|object $class): iterable
+    public static function getProperties(string|object $class)
     {
 
         static $cache = [];
@@ -156,7 +156,7 @@ abstract class Reflection
             }
         }
 
-        yield from $cache[$class];
+        return $cache[$class];
     }
 
     /**
@@ -190,9 +190,9 @@ abstract class Reflection
      * Get all class and subclasses properties
      *
      * @param string|object $class
-     * @return iterable<string, ReflectionMethod>
+     * @return ReflectionMethod[]
      */
-    public static function getMethods(string|object $class): iterable
+    public static function getMethods(string|object $class)
     {
         static $cache = [];
 
@@ -229,7 +229,7 @@ abstract class Reflection
             }
         }
 
-        yield from $cache[$class];
+        return $cache[$class];
     }
 
 }

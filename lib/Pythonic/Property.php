@@ -30,7 +30,7 @@ class Property
         $instances = [];
 
         /** @var self $attr */
-        foreach (AttributeReader::getPropertyAttributes($class, __CLASS__) as $prop => $attr)
+        foreach (AttributeReader::getPropertiesAttributes($class, __CLASS__) as $prop => $attr)
         {
 
             $attr->setName(
@@ -40,7 +40,7 @@ class Property
             $instances[$name] ??= $attr;
         }
 
-        foreach (AttributeReader::getMethodAttributes($class, __CLASS__) as $method => $attr)
+        foreach (AttributeReader::getMethodsAttributes($class, __CLASS__) as $method => $attr)
         {
 
             $attr->setName(
