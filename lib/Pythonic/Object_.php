@@ -17,6 +17,8 @@ use Pythonic\{
 class Object_
 {
 
+    use Traits\ClassUtils;
+
     /**
      * Reserved slots
      */
@@ -34,7 +36,7 @@ class Object_
     /**
      * @return string[]
      */
-    #[IsBuiltin]
+    #[IsBuiltin(__CLASS__)]
     public function __dir__(): iterable
     {
 
@@ -96,6 +98,12 @@ class Object_
         return $cache[$class];
     }
 
+    #[IsBuiltin(__CLASS__)]
+    public function __repr__(): string
+    {
+        return sprintf('<%s object>', static::classname());
+    }
+
     public function __construct()
     {
 
@@ -119,6 +127,17 @@ class Object_
         }
     }
 
+    protected function getMethodRepr(string $method): string
+    {
+
+        if ($attr = Utils\AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
+        {
+            return sprintf('<built-in method %s of %s object>', $method, $attr->class);
+        }
+
+        return sprintf('<bound method %s::%s of %s>', static::class, $method, $this->__repr__());
+    }
+
     public function __get(string $name): mixed
     {
 
@@ -128,6 +147,12 @@ class Object_
         {
             return $property->__get__($this);
         }
+
+        if (method_exists($this, $name))
+        {
+            return $this->getMethodRepr($name);
+        }
+
 
         return AttributeError::raiseForClassAttribute($this, $name);
     }

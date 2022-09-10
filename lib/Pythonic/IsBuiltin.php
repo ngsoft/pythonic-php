@@ -11,4 +11,9 @@ namespace Pythonic;
 class IsBuiltin
 {
 
+    public function __construct(public readonly string $class)
+    {
+
+    }
+
 }
