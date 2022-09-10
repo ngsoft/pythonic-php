@@ -7,7 +7,7 @@ namespace Pythonic;
 use Attribute,
     Closure;
 use Pythonic\{
-    Errors\TypeError, Utils\AttributeReader, Utils\Reflection
+    Errors\AttributeError, Errors\TypeError, Utils\AttributeReader, Utils\Reflection
 };
 
 /**
@@ -146,7 +146,7 @@ class Property
 
         if ( ! $this->fget)
         {
-            return null;
+            AttributeError::raise("AttributeError: can\'t get attribute");
         }
 
         return call_user_func($this->getCallable($obj, $this->fget));
@@ -157,7 +157,7 @@ class Property
 
         if ( ! $this->fset)
         {
-            return;
+            AttributeError::raise("AttributeError: can\'t set attribute");
         }
 
         call_user_func($this->getCallable($obj, $this->fset), $value);
@@ -168,7 +168,7 @@ class Property
 
         if ( ! $this->fdel)
         {
-            return;
+            AttributeError::raise("AttributeError: can\'t delete attribute");
         }
 
         call_user_func($this->getCallable($obj, $this->fdel));

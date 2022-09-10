@@ -26,7 +26,7 @@ class Object_
     protected ?array $__slots__ = null;
     protected ?string $__class__ = null;
 
-    #[Property]
+    #[Property, IsBuiltin]
     public function __class__(): string
     {
         return $this->__class__ ??= sprintf('<class \'%s\'>', static::class);
@@ -92,8 +92,6 @@ class Object_
         }
 
 
-
-
         return $cache[$class];
     }
 
@@ -109,17 +107,7 @@ class Object_
         /** @var Property $instance */
         foreach (Property::of($this) as $prop => $instance)
         {
-            if ($this->__slots__ && ! in_array($prop, $this->__slots__))
-            {
-                AttributeError::raiseForClassAttribute($this, $prop);
-            }
-
             $this->__dict__[$prop] = $instance;
-        }
-
-        if (static::class === __CLASS__)
-        {
-            return;
         }
     }
 
@@ -131,12 +119,23 @@ class Object_
             return sprintf('<method-wrapper %s of %s object>', $method, static::classname());
         }
 
-        if ($attr = AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
+        if (AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
         {
             return sprintf('<built-in method %s of %s object>', $method, static::classname());
         }
 
         return sprintf('<bound method %s::%s of %s>', static::class, $method, $this->__repr__());
+    }
+
+    protected function hasSlot(string $name): bool
+    {
+
+        if (null === $this->__slots__)
+        {
+            return true;
+        }
+
+        return in_array($name, $this->__slots__);
     }
 
     public function __get(string $name): mixed
@@ -148,14 +147,18 @@ class Object_
         {
             return $property->__get__($this);
         }
-
-        if (method_exists($this, $name))
+        elseif (method_exists($this, $name))
         {
             return $this->getMethodRepr($name);
         }
-
-
-        return AttributeError::raiseForClassAttribute($this, $name);
+        elseif ($this->hasSlot($name))
+        {
+            return $property;
+        }
+        else
+        {
+            return AttributeError::raiseForClassAttribute($this, $name);
+        }
     }
 
     public function __set(string $name, mixed $value): void
@@ -167,8 +170,14 @@ class Object_
         {
             $property->__set__($this, $value);
         }
-
-        AttributeError::raiseForClassAttribute($this, $name);
+        elseif ($this->hasSlot($name) && ! method_exists($this, $name))
+        {
+            $this->__dict__[$name] = $value;
+        }
+        else
+        {
+            AttributeError::raiseForClassAttribute($this, $name);
+        }
     }
 
     public function __unset(string $name): void
@@ -178,9 +187,17 @@ class Object_
         if ($property instanceof Property)
         {
             $property->__delete__($this);
+            return;
         }
-
-        AttributeError::raiseForClassAttribute($this, $name);
+        elseif ($this->hasSlot($name) && ! method_exists($this, $name))
+        {
+            unset($this->__dict__[$name]);
+            return;
+        }
+        else
+        {
+            AttributeError::raiseForClassAttribute($this, $name);
+        }
     }
 
     public function __isset(string $name): bool
