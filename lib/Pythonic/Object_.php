@@ -21,7 +21,7 @@ class Object_
     protected array|ArrayAccess $__dict__ = [];
 
     /**
-     *
+     * @return string[]
      */
     public function __dir__(): iterable
     {
