@@ -69,7 +69,7 @@ class Macro
     }
 
     /**
-     * Creates multiple instances from a class
+     * Creates multiple instances from a class (static methods)
      */
     public static function fromStatic(string|object $class): array
     {
