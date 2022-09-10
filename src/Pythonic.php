@@ -7,6 +7,6 @@ namespace NGSOFT;
 class Pythonic
 {
 
-    public const VERSION = '1.0';
+    public const VERSION = '1.0.0';
 
 }
