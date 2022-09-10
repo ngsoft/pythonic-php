@@ -6,6 +6,7 @@ namespace Pythonic\Utils;
 
 use ArrayAccess,
     Countable,
+    ErrorException,
     Pythonic\Errors\TypeError,
     Stringable,
     Throwable;
@@ -229,7 +230,7 @@ abstract class Utils
         }
 
         // ArrayAccess&Countable
-        for ($offset = 0; $offset < count($value); $offset ++)
+        for ($offset = 0; $offset < count($value); $offset ++ )
         {
 
             try
@@ -313,6 +314,97 @@ abstract class Utils
     public static function get_user_defined_constants(): array
     {
         return get_defined_constants(true)['user'] ?? [];
+    }
+
+    /**
+     * Throws ErrorException instead of displaying warnings
+     */
+    public static function errors_as_exception(): void
+    {
+
+
+        static $errorHandler;
+
+        $errorHandler ??= static function (
+                int $errno,
+                string $errstr,
+                string $errfile,
+                int $errline
+        )
+        {
+
+            if ( ! (error_reporting() & $errno))
+            {
+                return false;
+            }
+
+            throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+        };
+
+        if ( ! static::get_error_handler() !== $errorHandler)
+        {
+            set_error_handler($errorHandler);
+        }
+    }
+
+    /**
+     * Adds an error handler if not already in the stack
+     */
+    public static function add_error_handler(callable $handler): void
+    {
+
+        if (static::is_error_handler($handler))
+        {
+            set_error_handler($handler);
+        }
+    }
+
+    /**
+     * Get the current set error handler
+     *
+     * @phan-suppress PhanTypeMismatchArgumentInternal
+     */
+    public static function get_error_handler(): ?callable
+    {
+
+        try
+        {
+            return set_error_handler(fn() => null);
+        }
+        finally
+        {
+            restore_error_handler();
+        }
+    }
+
+    /**
+     * List current set error handlers
+     */
+    public static function list_error_handlers(): array
+    {
+        $result = [];
+
+        // unset/get the handlers
+        while ($handler = static::get_error_handler())
+        {
+            $result[] = $handler;
+            restore_error_handler();
+        }
+        // reset the handlers
+        $stack = $result;
+        while ($handler = array_pop($stack))
+        {
+            set_error_handler($handler);
+        }
+        return $result;
+    }
+
+    /**
+     * Checks if handler is already defined ahs an error handler
+     */
+    public static function is_error_handler(callable $handler): bool
+    {
+        return in_array($handler, static::list_error_handlers());
     }
 
 }
