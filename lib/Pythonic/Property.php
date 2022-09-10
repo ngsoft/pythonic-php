@@ -46,6 +46,9 @@ class Property
             $attr->setName(
                     $name = $attr->getName() ?? $method
             );
+
+            $attr->fget ??= $method;
+
             $instances[$name] ??= $attr;
         }
 

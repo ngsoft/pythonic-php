@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
-use ArrayAccess;
 use Pythonic\{
     Enums\PHP, Errors\AttributeError, Utils\Reflection
 };
@@ -18,11 +17,24 @@ use Pythonic\{
 class Object_
 {
 
-    protected array|ArrayAccess $__dict__ = [];
+    /**
+     * Reserved slots
+     */
+    protected array $__dict__ = [];
+    protected ?array $__slots__ = null;
+    protected ?string $__class__ = null;
+
+    #[Property]
+    public function __class__(): string
+    {
+
+        return $this->__class__ ??= sprintf('<class \'%s\'>', static::class);
+    }
 
     /**
      * @return string[]
      */
+    #[IsBuiltin]
     public function __dir__(): iterable
     {
 
@@ -87,15 +99,23 @@ class Object_
     public function __construct()
     {
 
-        if (static::class === __CLASS__)
-        {
-            return;
-        }
-
         /** @var Property $instance */
         foreach (Property::of($this) as $prop => $instance)
         {
+            if ($this->__slots__ && ! in_array($prop, $this->__slots__))
+            {
+                AttributeError::raiseForClassAttribute($this, $prop);
+            }
+
+
             $this->__dict__[$prop] = $instance;
+        }
+
+
+
+        if (static::class === __CLASS__)
+        {
+            return;
         }
     }
 
@@ -109,7 +129,7 @@ class Object_
             return $property->__get__($this);
         }
 
-        return AttributeError::raise('attribute %s does not exists.', $name);
+        return AttributeError::raiseForClassAttribute($this, $name);
     }
 
     public function __set(string $name, mixed $value): void
@@ -122,7 +142,7 @@ class Object_
             $property->__set__($this, $value);
         }
 
-        AttributeError::raise('attribute %s does not exists.', $name);
+        AttributeError::raiseForClassAttribute($this, $name);
     }
 
     public function __unset(string $name): void
@@ -134,7 +154,7 @@ class Object_
             $property->__delete__($this);
         }
 
-        AttributeError::raise('attribute %s does not exists.', $name);
+        AttributeError::raiseForClassAttribute($this, $name);
     }
 
     public function __isset(string $name): bool
