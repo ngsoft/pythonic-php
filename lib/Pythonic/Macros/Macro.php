@@ -118,8 +118,21 @@ class Macro
 
     }
 
-    public function __invoke(object|null $self, string $class, mixed ...$arguments): mixed
+    public function __invoke(object|string $self, array $arguments = []): mixed
     {
+
+        $class = $self;
+
+        if ( ! is_string($class))
+        {
+            $class = get_class($class);
+        }
+        else
+        {
+            $self = null;
+        }
+
+
         $callable = $this->callable->bindTo($self, $class);
         return call_user_func_array($callable, $arguments);
     }

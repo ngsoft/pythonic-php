@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Pythonic\Macros;
 
-use Pythonic\Traits\ClassUtils;
+use Pythonic\Errors\AttributeError;
 
-class MacroAble
+class HasMacros
 {
 
     /**
@@ -53,21 +53,36 @@ class MacroAble
     protected static function getStaticMacro(string $name): Macro
     {
 
-
         if ( ! isset(static::$__macros__[$name]) || ! static::$__macros__[$name]->isStatic())
         {
-
+            AttributeError::raiseForClassAttribute(static::class, $name);
         }
+        return static::$__macros__[$name];
+    }
+
+    protected static function getMacro(string $name): Macro
+    {
+
+        if ( ! isset(static::$__macros__[$name]) || static::$__macros__[$name]->isStatic())
+        {
+            AttributeError::raiseForClassAttribute(static::class, $name);
+        }
+        return static::$__macros__[$name];
     }
 
     public function __call(string $name, array $arguments)
     {
 
+        $macro = static::getMacro($name);
+        return $macro($this, $arguments);
     }
 
     public static function __callStatic(string $name, array $arguments)
     {
 
+        $macro = static::getStaticMacro($name);
+
+        return $macro(static::class, $arguments);
     }
 
 }
