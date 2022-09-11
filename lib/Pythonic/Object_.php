@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
+use Closure,
+    ErrorException;
 use Pythonic\{
-    Enums\PHP, Errors\AttributeError, Errors\TypeError, Traits\ClassUtils, Typing\Types, Utils\AttributeReader, Utils\Reflection
+    Enums\PHP, Errors\AttributeError, Errors\TypeError, Traits\ClassUtils, Typing\Types, Utils\AttributeReader, Utils\Reflection, Utils\Utils
 };
 
 /**
@@ -128,6 +130,9 @@ class Object_
         {
             $this->__dict__[$prop] ??= null;
         }
+
+
+        $this->test = pass(...);
     }
 
     protected function getMethodRepr(string $method): string
@@ -255,12 +260,28 @@ class Object_
 
         if (is_callable($property))
         {
-            $closure = $property instanceof \Closure ? $property : \Closure::fromCallable($property);
-            $closure = $closure->bindTo($this, static::class());
+
+
+            $closure = $property instanceof Closure ? $property : Closure::fromCallable($property);
+
+            try
+            {
+                Utils::errors_as_exception();
+                $closure = $closure->bindTo($this, static::class());
+            }
+            catch (ErrorException)
+            {
+
+            }
+            finally
+            {
+                restore_error_handler();
+            }
+
             return $closure(...$arguments);
         }
 
-        return TypeError::message("'%s' object is not callable.", static::classname(Types::getType($property)));
+        return TypeError::raise("'%s' object is not callable.", static::classname(Types::getType($property)));
     }
 
 }
