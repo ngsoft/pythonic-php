@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
-use ArrayAccess,
-    Closure,
+use Closure,
     ErrorException;
 use Pythonic\{
     Enums\PHP, Errors\AttributeError, Errors\TypeError, Traits\ClassUtils, Typing\Types, Utils\AttributeReader, Utils\Reflection, Utils\Utils
@@ -37,10 +36,10 @@ class Object_
     /**
      * __class__() cache
      */
-    protected ?string $__class__ = null;
+    protected $__class__ = null;
 
     #[Property]
-    public function __class__(): string
+    protected function __class__(): string
     {
         return $this->__class__ ??= sprintf('<class \'%s\'>', static::class);
     }
@@ -49,7 +48,7 @@ class Object_
      * @return string[]
      */
     #[IsBuiltin]
-    public function __dir__(): iterable
+    protected function __dir__(): iterable
     {
 
         static $hideMethods, $cache = [];
@@ -109,13 +108,13 @@ class Object_
     }
 
     #[IsBuiltin]
-    public function __repr__(): string
+    protected function __repr__(): string
     {
         return sprintf('<%s object>', static::classname());
     }
 
     #[IsBuiltin]
-    public function __delattr__(string $name): void
+    protected function __delattr__(string $name): void
     {
 
 
@@ -144,7 +143,7 @@ class Object_
     }
 
     #[IsBuiltin]
-    public function __setattr__(string $name, mixed $value): void
+    protected function __setattr__(string $name, mixed $value): void
     {
         $property = $this->__dict__[$name] ?? null;
 
@@ -192,12 +191,13 @@ class Object_
     }
 
     #[IsBuiltin]
-    public function __getattribute__(string $name): mixed
+    protected function __getattribute__(string $name): mixed
     {
         $property = $this->__dict__[$name] ?? null;
 
         if ($property instanceof Property)
         {
+            var_dump($property);
             return $property->__get__($this);
         }
         elseif ($name === '__dict__')
@@ -216,7 +216,6 @@ class Object_
 
     public function __construct()
     {
-
         /** @var Property $instance */
         foreach (Property::of($this) as $prop => $instance)
         {
@@ -305,6 +304,15 @@ class Object_
 
     public function __call(string $name, array $arguments): mixed
     {
+
+        // public call to protected methods
+
+        if (is_dunder($name) && method_exists($this, $name))
+        {
+            return $this->{$name}(...$arguments);
+        }
+
+
         $property = $this->__getattribute__($name);
 
         if (is_callable($property))
