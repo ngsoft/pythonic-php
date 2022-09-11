@@ -111,6 +111,114 @@ class Object_
         return sprintf('<%s object>', static::classname());
     }
 
+    #[IsBuiltin]
+    public function __delattr__(string $name): void
+    {
+
+
+        $property = $this->__dict__[$name] ?? null;
+
+        if ($property instanceof Property)
+        {
+            $property->__delete__($this);
+        }
+        elseif ($name === '__slots__' && null !== $this->__slots__)
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
+        elseif (method_exists($this, $name) && ! $this->hasSlot($name))
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
+        elseif (null !== $property)
+        {
+            unset($this->__dict__[$name]);
+        }
+        else
+        {
+            AttributeError::raiseForClassAttribute($this, $name);
+        }
+    }
+
+    #[IsBuiltin]
+    public function __setattr__(string $name, mixed $value): void
+    {
+        $property = $this->__dict__[$name] ?? null;
+
+        if ($property instanceof Property)
+        {
+            $property->__set__($this, $value);
+        }
+        elseif ($name === '__slots__' && null !== $this->__slots__)
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
+        elseif (method_exists($this, $name) && ! $this->hasSlot($name))
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
+        elseif ($this->hasSlot($name))
+        {
+
+            if (is_callable($value))
+            {
+
+                $value = $value instanceof Closure ? $value : Closure::fromCallable($value);
+                try
+                {
+                    Utils::errors_as_exception();
+                    $value = $value->bindTo($this, static::class());
+                }
+                catch (ErrorException)
+                {
+
+                }
+                finally
+                {
+                    restore_error_handler();
+                }
+            }
+
+
+            $this->__dict__[$name] = $value;
+        }
+        else
+        {
+            AttributeError::raiseForClassAttribute($this, $name);
+        }
+    }
+
+    #[IsBuiltin]
+    public function __getattribute__(string $name): mixed
+    {
+        $property = $this->__dict__[$name] ?? null;
+
+        if ($property instanceof Property)
+        {
+            return $property->__get__($this);
+        }
+        elseif (is_callable($property))
+        {
+            return $this->getMethodRepr($name);
+        }
+        elseif ($name === '__dict__')
+        {
+            return $this->__dict__;
+        }
+        elseif ($this->hasSlot($name) && $this->__isset($name))
+        {
+            return $property;
+        }
+        elseif (method_exists($this, $name))
+        {
+            return $this->getMethodRepr($name);
+        }
+        else
+        {
+            return AttributeError::raiseForClassAttribute($this, $name);
+        }
+    }
+
     public function __construct()
     {
 
@@ -175,85 +283,17 @@ class Object_
     public function __get(string $name): mixed
     {
 
-        $property = $this->__dict__[$name] ?? null;
-
-        if ($property instanceof Property)
-        {
-            return $property->__get__($this);
-        }
-        elseif (is_callable($property))
-        {
-            return $this->getMethodRepr($name);
-        }
-        elseif ($name === '__dict__')
-        {
-            return $this->__dict__;
-        }
-        elseif ($this->hasSlot($name) && $this->__isset($name))
-        {
-            return $property;
-        }
-        elseif (method_exists($this, $name))
-        {
-            return $this->getMethodRepr($name);
-        }
-        else
-        {
-            return AttributeError::raiseForClassAttribute($this, $name);
-        }
+        return $this->__getattribute__($name);
     }
 
     public function __set(string $name, mixed $value): void
     {
-
-        $property = $this->__dict__[$name] ?? null;
-
-        if ($property instanceof Property)
-        {
-            $property->__set__($this, $value);
-        }
-        elseif ($name === '__slots__' && null !== $this->__slots__)
-        {
-            AttributeError::raiseForReadOnlyAttribute($this, $name);
-        }
-        elseif (method_exists($this, $name) && ! $this->hasSlot($name))
-        {
-            AttributeError::raiseForReadOnlyAttribute($this, $name);
-        }
-        elseif ($this->hasSlot($name))
-        {
-            $this->__dict__[$name] = $value;
-        }
-        else
-        {
-            AttributeError::raiseForClassAttribute($this, $name);
-        }
+        $this->__setattr__($name, $value);
     }
 
     public function __unset(string $name): void
     {
-        $property = $this->__dict__[$name] ?? null;
-
-        if ($property instanceof Property)
-        {
-            $property->__delete__($this);
-        }
-        elseif ($name === '__slots__' && null !== $this->__slots__)
-        {
-            AttributeError::raiseForReadOnlyAttribute($this, $name);
-        }
-        elseif (method_exists($this, $name) && ! $this->hasSlot($name))
-        {
-            AttributeError::raiseForReadOnlyAttribute($this, $name);
-        }
-        elseif (null !== $property)
-        {
-            unset($this->__dict__[$name]);
-        }
-        else
-        {
-            AttributeError::raiseForClassAttribute($this, $name);
-        }
+        $this->__delattr__($name);
     }
 
     public function __isset(string $name): bool
@@ -274,25 +314,7 @@ class Object_
 
         if (is_callable($property))
         {
-
-
-            $closure = $property instanceof Closure ? $property : Closure::fromCallable($property);
-
-            try
-            {
-                Utils::errors_as_exception();
-                $closure = $closure->bindTo($this, static::class());
-            }
-            catch (ErrorException)
-            {
-
-            }
-            finally
-            {
-                restore_error_handler();
-            }
-
-            return $closure(...$arguments);
+            return $property(...$arguments);
         }
 
         return TypeError::raise("'%s' object is not callable.", static::classname(Types::getType($property)));
