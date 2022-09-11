@@ -139,3 +139,11 @@ function is_dunder(mixed $value): bool
             mb_substr($value, 2, 1) !== '_' &&
             mb_substr($value, -3, 1) !== '_';
 }
+
+/**
+ * Pass
+ */
+function pass()
+{
+    return;
+}

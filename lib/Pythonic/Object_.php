@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pythonic;
 
 use Pythonic\{
-    Enums\PHP, Errors\AttributeError, Traits\ClassUtils, Utils\AttributeReader, Utils\Reflection
+    Enums\PHP, Errors\AttributeError, Errors\TypeError, Traits\ClassUtils, Typing\Types, Utils\AttributeReader, Utils\Reflection
 };
 
 /**
@@ -118,10 +118,14 @@ class Object_
             $this->__dict__[$prop] = $instance;
         }
 
+        if (null !== $this->__slots__)
+        {
+            $this->__dict__['__slots__'] = $this->__slots__;
+        }
+
         // reserve slots, if not already
         foreach ($this->__slots__ ?? [] as $prop)
         {
-
             $this->__dict__[$prop] ??= null;
         }
     }
@@ -162,6 +166,10 @@ class Object_
         {
             return $property->__get__($this);
         }
+        elseif ($name === '__dict__')
+        {
+            return $this->__dict__;
+        }
         elseif ($this->hasSlot($name) && $this->__isset($name))
         {
             return $property;
@@ -185,6 +193,14 @@ class Object_
         {
             $property->__set__($this, $value);
         }
+        elseif ($name === '__slots__' && null !== $this->__slots__)
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
+        elseif (method_exists($this, $name) && ! $this->hasSlot($name))
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
         elseif ($this->hasSlot($name))
         {
             $this->__dict__[$name] = $value;
@@ -203,6 +219,14 @@ class Object_
         {
             $property->__delete__($this);
         }
+        elseif ($name === '__slots__' && null !== $this->__slots__)
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
+        elseif (method_exists($this, $name) && ! $this->hasSlot($name))
+        {
+            AttributeError::raiseForReadOnlyAttribute($this, $name);
+        }
         elseif (null !== $property)
         {
             unset($this->__dict__[$name]);
@@ -216,6 +240,27 @@ class Object_
     public function __isset(string $name): bool
     {
         return array_key_exists($name, $this->__dict__);
+    }
+
+    public function __call(string $name, array $arguments): mixed
+    {
+
+        if ( ! $this->__isset($name))
+        {
+            return AttributeError::raiseForClassAttribute($this, $name);
+        }
+
+
+        $property = $this->__dict__[$name] ?? null;
+
+        if (is_callable($property))
+        {
+            $closure = $property instanceof \Closure ? $property : \Closure::fromCallable($property);
+            $closure = $closure->bindTo($this, static::class());
+            return $closure(...$arguments);
+        }
+
+        return TypeError::message("'%s' object is not callable.", static::classname(Types::getType($property)));
     }
 
 }

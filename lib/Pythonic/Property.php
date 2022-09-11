@@ -146,7 +146,7 @@ class Property
 
         if ( ! $this->fget)
         {
-            AttributeError::raise("AttributeError: can\'t get attribute");
+            AttributeError::of('can\'t get attribute');
         }
 
         return call_user_func($this->getCallable($obj, $this->fget));
@@ -157,7 +157,7 @@ class Property
 
         if ( ! $this->fset)
         {
-            AttributeError::raise("AttributeError: can\'t set attribute");
+            AttributeError::of('can\'t set attribute');
         }
 
         call_user_func($this->getCallable($obj, $this->fset), $value);
@@ -168,7 +168,7 @@ class Property
 
         if ( ! $this->fdel)
         {
-            AttributeError::raise("AttributeError: can\'t delete attribute");
+            AttributeError::of('can\'t delete attribute');
         }
 
         call_user_func($this->getCallable($obj, $this->fdel));
