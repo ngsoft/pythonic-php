@@ -27,7 +27,7 @@ class Object_
     protected array $__dict__ = [];
 
     /**
-     * Dunder methods
+     * Dunder protected methods
      */
     protected array $__methods__ = [];
 
@@ -86,7 +86,7 @@ class Object_
 
             foreach (Reflection::getProperties($this) as $reflectionProperty)
             {
-                if ( ! $reflectionProperty->isPublic() && ! $reflectionProperty->isStatic())
+                if ( ! $reflectionProperty->isPublic() || $reflectionProperty->isStatic())
                 {
                     continue;
                 }
@@ -301,7 +301,7 @@ class Object_
         return in_array($name, $this->__slots__);
     }
 
-    public function __get(string $name): mixed
+    final public function __get(string $name): mixed
     {
         try
         {

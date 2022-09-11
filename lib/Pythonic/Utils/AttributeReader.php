@@ -14,30 +14,26 @@ abstract class AttributeReader
      */
     public static function getClassAttribute(string|object $class, string $attribute): ?object
     {
-
-
-        try
+        /** @var \ReflectionClass $reflectionClass */
+        /** @var \ReflectionAttribute $reflectionAttribute */
+        foreach (Reflection::getSubClasses($class) as $reflectionClass)
         {
 
-            /** @var \ReflectionClass $reflectionClass */
-            /** @var \ReflectionAttribute $reflectionAttribute */
-            foreach (Reflection::getSubClasses($class) as $reflectionClass)
+            foreach ($reflectionClass->getAttributes() as $reflectionAttribute)
             {
-
-                foreach ($reflectionClass->getAttributes() as $reflectionAttribute)
+                if ($reflectionAttribute->getName() === $attribute)
                 {
-                    if ($reflectionAttribute->getName() === $attribute)
+                    try
                     {
                         return $reflectionAttribute->newInstance();
+                    }
+                    catch (Throwable)
+                    {
+
                     }
                 }
             }
         }
-        catch (Throwable)
-        {
-
-        }
-
 
         return null;
     }
