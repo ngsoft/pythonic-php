@@ -30,7 +30,7 @@ class Object_
     /**
      * Reserved slots
      *
-     * @var ArrayAccess|array|null
+     * @var array|null
      */
     protected $__slots__ = null;
 

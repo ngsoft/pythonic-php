@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Pythonic;
 
 use Attribute,
-    Closure;
+    Closure,
+    ErrorException;
 use Pythonic\{
-    Errors\AttributeError, Errors\TypeError, Utils\AttributeReader, Utils\Reflection
+    Errors\AttributeError, Errors\TypeError, Utils\AttributeReader, Utils\Reflection, Utils\Utils
 };
 
 /**
@@ -127,7 +128,19 @@ class Property
 
         if ($method instanceof Closure)
         {
-            return $method->bindTo($obj);
+            try
+            {
+                Utils::errors_as_exception();
+                return $method->bindTo($obj, get_class($obj));
+            }
+            catch (ErrorException)
+            {
+                return $method;
+            }
+            finally
+            {
+                restore_error_handler();
+            }
         }
 
 
