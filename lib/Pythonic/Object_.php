@@ -30,7 +30,7 @@ class Object_
     /**
      * Reserved slots
      *
-     * @var array|null
+     * @var array|\ArrayAccess&\Countable&\Traversable|null
      */
     protected $__slots__ = null;
 
@@ -133,7 +133,7 @@ class Object_
         {
             AttributeError::raiseForReadOnlyAttribute($this, $name);
         }
-        elseif (null !== $property)
+        elseif ($this->__isset($name))
         {
             unset($this->__dict__[$name]);
         }
@@ -200,10 +200,6 @@ class Object_
         {
             return $property->__get__($this);
         }
-        elseif (is_callable($property))
-        {
-            return $this->getMethodRepr($name);
-        }
         elseif ($name === '__dict__')
         {
             return $this->__dict__;
@@ -211,10 +207,6 @@ class Object_
         elseif ($this->hasSlot($name) && $this->__isset($name))
         {
             return $property;
-        }
-        elseif (method_exists($this, $name))
-        {
-            return $this->getMethodRepr($name);
         }
         else
         {
@@ -279,8 +271,21 @@ class Object_
 
     public function __get(string $name): mixed
     {
+        try
+        {
+            return $this->__getattribute__($name);
+        }
+        catch (AttributeError $error)
+        {
 
-        return $this->__getattribute__($name);
+            if (method_exists($this, $name) || is_callable($this->__dict__[$name] ?? null))
+            {
+
+                return $this->getMethodRepr($name);
+            }
+
+            throw $error;
+        }
     }
 
     public function __set(string $name, mixed $value): void
@@ -300,14 +305,7 @@ class Object_
 
     public function __call(string $name, array $arguments): mixed
     {
-
-        if ( ! $this->__isset($name))
-        {
-            return AttributeError::raiseForClassAttribute($this, $name);
-        }
-
-
-        $property = $this->__dict__[$name] ?? null;
+        $property = $this->__getattribute__($name);
 
         if (is_callable($property))
         {
