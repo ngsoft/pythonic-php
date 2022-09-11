@@ -25,12 +25,12 @@ class Object_
     /**
      * Public properties
      */
-    protected array|ArrayAccess $__dict__ = [];
+    protected array $__dict__ = [];
 
     /**
      * Reserved slots
      *
-     * @var array|\ArrayAccess&\Countable&\Traversable|null
+     * @var array|null
      */
     protected $__slots__ = null;
 
