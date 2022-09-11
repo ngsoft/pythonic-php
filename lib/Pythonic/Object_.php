@@ -27,21 +27,21 @@ class Object_
     protected array $__dict__ = [];
 
     /**
+     * Dunder methods
+     */
+    protected array $__methods__ = [];
+
+    /**
      * Reserved slots
      *
      * @var array|null
      */
     protected $__slots__ = null;
 
-    /**
-     * __class__() cache
-     */
-    protected $__class__ = null;
-
     #[Property]
     protected function __class__(): string
     {
-        return $this->__class__ ??= sprintf('<class \'%s\'>', static::class);
+        return sprintf('<class \'%s\'>', static::class());
     }
 
     /**
@@ -55,11 +55,12 @@ class Object_
 
         $hideMethods ??= PHP::getBuiltinMethods();
 
-        $class = get_class($this);
+        $class = static::class();
 
         if ( ! isset($cache[$class]))
         {
-            $cache[$class] = [];
+
+            $cache[$class] = $this->__methods__;
             $result = &$cache[$class];
 
             foreach (Reflection::getMethods($this) as $reflectionMethod)
@@ -197,7 +198,6 @@ class Object_
 
         if ($property instanceof Property)
         {
-            var_dump($property);
             return $property->__get__($this);
         }
         elseif ($name === '__dict__')
@@ -216,21 +216,54 @@ class Object_
 
     public function __construct()
     {
-        /** @var Property $instance */
-        foreach (Property::of($this) as $prop => $instance)
+
+        static $cache = [];
+
+        if ( ! isset($cache[static::class]))
         {
-            $this->__dict__[$prop] = $instance;
+
+            $cache[static::class] = [
+                '__dict__' => $this->__dict__,
+                '__methods__' => $this->__methods__
+            ];
+
+            $dict = &$cache[static::class]['__dict__'];
+            $methods = &$cache[static::class]['__methods__'];
+
+            /** @var Property $instance */
+            foreach (Property::of($this) as $prop => $instance)
+            {
+                $dict[$prop] = $instance;
+            }
+
+            if (null !== $this->__slots__)
+            {
+                $dict['__slots__'] = $this->__slots__;
+            }
+
+            // reserve slots, if not already
+            foreach ($this->__slots__ ?? [] as $prop)
+            {
+                $dict[$prop] ??= null;
+            }
+
+            // add dunder method to __call
+            foreach (Reflection::getMethods($this) as $reflectionMethod)
+            {
+
+                if ($reflectionMethod->isStatic() || $reflectionMethod->isPublic() || ! is_dunder($method = $reflectionMethod->getName()))
+                {
+                    continue;
+                }
+
+                $methods[$method] = $method;
+            }
         }
 
-        if (null !== $this->__slots__)
+        foreach ($cache[static::class] as $prop => $value)
         {
-            $this->__dict__['__slots__'] = $this->__slots__;
-        }
 
-        // reserve slots, if not already
-        foreach ($this->__slots__ ?? [] as $prop)
-        {
-            $this->__dict__[$prop] ??= null;
+            $this->{$prop} = $value;
         }
     }
 
@@ -287,12 +320,12 @@ class Object_
         }
     }
 
-    public function __set(string $name, mixed $value): void
+    final public function __set(string $name, mixed $value): void
     {
         $this->__setattr__($name, $value);
     }
 
-    public function __unset(string $name): void
+    final public function __unset(string $name): void
     {
         $this->__delattr__($name);
     }
@@ -302,16 +335,18 @@ class Object_
         return array_key_exists($name, $this->__dict__);
     }
 
-    public function __call(string $name, array $arguments): mixed
+    final public function __call(string $name, array $arguments): mixed
     {
 
         // public call to protected methods
 
-        if (is_dunder($name) && method_exists($this, $name))
+        if (isset($this->__methods__[$name]))
         {
             return $this->{$name}(...$arguments);
         }
 
+
+        // call to closures
 
         $property = $this->__getattribute__($name);
 
