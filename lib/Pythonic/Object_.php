@@ -143,10 +143,20 @@ class Object_
             return sprintf('<method-wrapper %s of %s object>', $method, static::classname());
         }
 
-        if (AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
+        // dynamic methods __dict__[$method] will throw TypeError
+        try
         {
-            return sprintf('<built-in method %s of %s object>', $method, static::classname());
+            if (AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
+            {
+                return sprintf('<built-in method %s of %s object>', $method, static::classname());
+            }
         }
+        catch (TypeError)
+        {
+
+        }
+
+
 
         return sprintf('<bound method %s::%s of %s>', static::class, $method, $this->__repr__());
     }
@@ -170,6 +180,10 @@ class Object_
         if ($property instanceof Property)
         {
             return $property->__get__($this);
+        }
+        elseif (is_callable($property))
+        {
+            return $this->getMethodRepr($name);
         }
         elseif ($name === '__dict__')
         {
