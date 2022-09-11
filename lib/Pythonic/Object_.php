@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
-use Closure,
+use ArrayAccess,
+    Closure,
     ErrorException;
 use Pythonic\{
     Enums\PHP, Errors\AttributeError, Errors\TypeError, Traits\ClassUtils, Typing\Types, Utils\AttributeReader, Utils\Reflection, Utils\Utils
@@ -24,15 +25,17 @@ class Object_
     /**
      * Public properties
      */
-    protected array $__dict__ = [];
+    protected array|ArrayAccess $__dict__ = [];
 
     /**
      * Reserved slots
+     *
+     * @var ArrayAccess|array|null
      */
     protected $__slots__ = null;
 
     /**
-     * __class__() caches
+     * __class__() cache
      */
     protected ?string $__class__ = null;
 
@@ -238,22 +241,18 @@ class Object_
         {
             $this->__dict__[$prop] ??= null;
         }
-
-
-        $this->test = pass(...);
     }
 
     protected function getMethodRepr(string $method): string
     {
 
-        if ($method === '__repr__')
-        {
-            return sprintf('<method-wrapper %s of %s object>', $method, static::classname());
-        }
-
-        // dynamic methods __dict__[$method] will throw TypeError
         try
         {
+            if ($method === '__repr__')
+            {
+                return sprintf('<method-wrapper %s of %s object>', $method, static::classname());
+            }
+            // dynamic methods __dict__[$method] will throw TypeError
             if (AttributeReader::getMethodAttribute($this, $method, IsBuiltin::class))
             {
                 return sprintf('<built-in method %s of %s object>', $method, static::classname());
@@ -264,15 +263,13 @@ class Object_
 
         }
 
-
-
         return sprintf('<bound method %s::%s of %s>', static::class, $method, $this->__repr__());
     }
 
     protected function hasSlot(string $name): bool
     {
 
-        if (null === $this->__slots__)
+        if ( ! Utils::is_arrayaccess($this->__slots__))
         {
             return true;
         }
