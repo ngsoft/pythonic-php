@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pythonic\Typing;
 
-use Pythonic\Traits\{
+use NGSOFT\Pythonic\Traits\{
     ClassUtils, NotInstanciable, Singleton
 };
 

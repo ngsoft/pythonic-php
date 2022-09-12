@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Pythonic\Typing;
 
-use Pythonic\{
-    Errors\TypeError, Traits\NotInstanciable
-};
-use ReflectionClass;
+use NGSOFT\Pythonic\Traits\NotInstanciable,
+    Pythonic\Errors\TypeError,
+    ReflectionClass;
 use function get_debug_type;
 
 final class Types
