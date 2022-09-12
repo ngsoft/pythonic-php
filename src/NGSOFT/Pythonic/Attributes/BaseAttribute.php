@@ -16,7 +16,7 @@ use ReflectionAttribute,
 /**
  * A Base Class to use for Attributes
  */
-class BaseAttribute
+abstract class BaseAttribute
 {
 
     protected Target $target;
@@ -37,8 +37,6 @@ class BaseAttribute
             ReflectionClass|ReflectionFunction|ReflectionMethod|ReflectionParameter|ReflectionProperty|ReflectionClassConstant $container
     ): object
     {
-
-        $name = $container->getName();
 
         $instance = $reflector->newInstance();
         if ($instance instanceof self)
