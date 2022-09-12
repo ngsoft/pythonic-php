@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace NGSOFT\Pythonic\Utils;
+namespace NGSOFT\Pythonic\Attributes;
 
 use Throwable;
 
-abstract class AttributeReader
+abstract class Reader
 {
 
     /**
