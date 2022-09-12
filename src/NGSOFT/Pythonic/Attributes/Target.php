@@ -15,7 +15,7 @@ class Target implements \Stringable
     /**
      * Get an instance parsing ReflectionAttribute Informations
      */
-    public static function of(\ReflectionAttribute $reflector): static
+    public static function fromReflectionAttribute(\ReflectionAttribute $reflector): static
     {
         return new static($reflector->getTarget());
     }

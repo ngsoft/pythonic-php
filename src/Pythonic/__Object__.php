@@ -10,9 +10,4 @@ namespace Pythonic;
 class __Object__
 {
 
-    protected function __len__()
-    {
-
-    }
-
 }
