@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Utils;
+namespace NGSOFT\Pythonic\Utils;
 
 use Pythonic\Errors\ValueError,
     Stringable;
@@ -96,7 +96,7 @@ abstract class StrUtils
 
         $result = '';
 
-        for ($i = 0; $i < $count; $i ++)
+        for ($i = 0; $i < $count; $i ++ )
         {
             $offset = $start + ($i * $step);
 
