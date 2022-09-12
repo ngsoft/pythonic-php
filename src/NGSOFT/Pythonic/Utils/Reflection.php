@@ -63,28 +63,27 @@ abstract class Reflection
             $class = get_class($class);
         }
 
-        $cache[$class] ??= [];
-
-        if ( ! $cache[$class])
+        if ( ! class_exists($class))
         {
-            try
-            {
+            TypeError::raise('class %s does not exists.', $class);
+        }
 
-                $result = &$cache[$class];
-                $parent = $class;
-                while (false !== $parent)
-                {
-                    $result[$parent] = static::getClass($parent);
-                    $parent = get_parent_class($parent);
-                }
-            }
-            catch (TypeError | ReflectionException)
+        $cache[$class] ??= [];
+        $result = &$cache[$class];
+
+        if ( ! $result)
+        {
+
+            $parent = $class;
+            while (false !== $class)
             {
-                TypeError::raise('class %s does not exists.', $parent);
+                $result[$class] = static::getClass($class);
+                $class = get_parent_class($class);
             }
         }
 
-        return $cache[$class];
+
+        return $result;
     }
 
     /**

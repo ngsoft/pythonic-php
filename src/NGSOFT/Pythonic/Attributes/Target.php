@@ -7,23 +7,29 @@ namespace NGSOFT\Pythonic\Attributes;
 /**
  * Attribute Target Information
  */
-class Target
+class Target implements \Stringable
 {
+
+    protected TargetType $type;
 
     /**
      * Get an instance parsing ReflectionAttribute Informations
      */
     public static function of(\ReflectionAttribute $reflector): static
     {
-        return new static($reflector->getName(), $reflector->getTarget());
+        return new static($reflector->getTarget());
     }
 
     public function __construct(
-            public readonly string $name,
             public readonly int $target
     )
     {
+        $this->type = TargetType::from($target);
+    }
 
+    public function __toString(): string
+    {
+        return $this->type->name;
     }
 
 }
