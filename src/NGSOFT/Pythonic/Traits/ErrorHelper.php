@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Traits;
+namespace NGSOFT\Pythonic\Traits;
 
 use Pythonic\Utils\Utils,
     Throwable;

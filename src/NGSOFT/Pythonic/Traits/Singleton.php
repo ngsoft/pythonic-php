@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Traits;
+namespace NGSOFT\Pythonic\Traits;
 
-use Pythonic\{
-    Errors\NotImplementedError, Errors\RuntimeError, Utils\StrUtils
+use NGSOFT\Pythonic\Utils\StrUtils;
+use Pythonic\Errors\{
+    NotImplementedError, RuntimeError
 };
 use ReflectionException,
     ReflectionMethod;

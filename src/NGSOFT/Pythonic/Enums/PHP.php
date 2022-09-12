@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Enums;
+namespace NGSOFT\Pythonic\Enums;
 
 class PHP
 {
@@ -59,7 +59,6 @@ class PHP
 
             foreach (static::getBuiltinInterfaces() as $class)
             {
-
                 foreach (get_class_methods($class) as $method)
                 {
                     $cache[$method] = $method;
