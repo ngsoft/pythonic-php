@@ -7,8 +7,11 @@ namespace Pythonic;
 use Attribute,
     Closure,
     ErrorException;
-use Pythonic\{
-    Errors\AttributeError, Errors\TypeError, Utils\AttributeReader, Utils\Reflection, Utils\Utils
+use NGSOFT\Pythonic\{
+    Attributes\BaseAttribute, Attributes\Reader, Utils\Utils
+};
+use Pythonic\Errors\{
+    AttributeError, TypeError
 };
 
 /**
@@ -18,7 +21,7 @@ use Pythonic\{
  * eg: $this->prop = new Property('getProp', 'setProp')
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD)]
-class Property
+class Property extends BaseAttribute
 {
 
     /**
@@ -31,49 +34,17 @@ class Property
         $instances = [];
 
         /** @var self $attr */
-        foreach (AttributeReader::getPropertiesAttributes($class, __CLASS__) as $prop => $attr)
+        foreach (Reader::getPropertiesAttributes($class, __CLASS__) as $attr)
         {
-
-            $attr->setName(
-                    $name = $attr->name ?? $prop
-            );
-
-            $instances[$name] ??= $attr;
+            $instances[$attr->getName()] ??= $attr;
         }
 
-        foreach (AttributeReader::getMethodsAttributes($class, __CLASS__) as $method => $attr)
+        foreach (Reader::getMethodsAttributes($class, __CLASS__) as $attr)
         {
 
-            $attr->setName(
-                    $name = $attr->getName() ?? $method
-            );
-
-            $attr->fget ??= $method;
-
-            $instances[$name] ??= $attr;
+            $attr->fget ??= $attr->getName();
+            $instances[$attr->getName()] ??= $attr;
         }
-
-        // reads properties return values and initialize those with exact return type
-
-        /** @var \ReflectionProperty $reflectionProperty */
-        foreach (Reflection::getProperties($class) as $reflectionProperty)
-        {
-
-            if (
-                    $reflectionProperty->hasType() &&
-                    ! $reflectionProperty->hasDefaultValue() &&
-                    (string) $reflectionProperty->getType() === __CLASS__ &&
-                    ! $reflectionProperty->isInitialized($class)
-            )
-            {
-                $name = $reflectionProperty->getName();
-                $instance = new static(name: $name);
-                $instances[$name] ??= $instance;
-                $reflectionProperty->setValue($class, $instance);
-            }
-        }
-
-
 
 
         return $instances;
@@ -83,7 +54,7 @@ class Property
      * @param string|null $fget Getter method name
      * @param string|null $fset Setter method name
      * @param string|null $fdel Deleter method name
-     * @param string|null $name Method name
+     * @param string|null $name property name
      */
     public function __construct(
             protected string|Closure|null $fget = null,
@@ -95,14 +66,9 @@ class Property
 
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
+        return $this->name ??= $this->container->getName();
     }
 
     public function getter(string|Closure $fget): static
@@ -143,15 +109,12 @@ class Property
             }
         }
 
-
-        $callable = [$obj, $method];
-
-        if ( ! is_callable($callable))
+        if ( ! method_exists($obj, $method))
         {
             TypeError::raise('object %s method %s is not accessible.', get_class($obj), $method);
         }
 
-        return $callable;
+        return [$obj, $method];
     }
 
     public function __get__(object $obj): mixed
