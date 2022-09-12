@@ -50,7 +50,7 @@ trait ClassUtils
     /**
      * Checks if class extends or is static
      */
-    protected static function isSelf(object|string $class)
+    protected static function isSelf(object|string $class): bool
     {
         return is_a($class, static::class, is_string($class));
     }

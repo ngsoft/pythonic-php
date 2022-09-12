@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Utils;
+namespace NGSOFT\Pythonic\Utils;
 
 use ArrayAccess,
     Countable,
@@ -230,7 +230,7 @@ abstract class Utils
         }
 
         // ArrayAccess&Countable
-        for ($offset = 0; $offset < count($value); $offset ++ )
+        for ($offset = 0; $offset < count($value); $offset ++)
         {
 
             try

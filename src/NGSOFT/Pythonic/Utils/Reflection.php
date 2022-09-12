@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Utils;
+namespace NGSOFT\Pythonic\Utils;
 
 use Pythonic\Errors\TypeError,
     ReflectionClass,
@@ -187,7 +187,7 @@ abstract class Reflection
     }
 
     /**
-     * Get all class and subclasses properties
+     * Get all class and subclasses methods
      *
      * @param string|object $class
      * @return ReflectionMethod[]

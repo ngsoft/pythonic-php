@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pythonic\Utils;
+namespace NGSOFT\Pythonic\Utils;
 
 use Pythonic\{
     Errors\ImportError, Traits\NotInstanciable, Traits\Singleton

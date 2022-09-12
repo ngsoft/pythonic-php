@@ -147,3 +147,5 @@ function pass()
 {
     return;
 }
+
+class_alias(__Object__::class, __NAMESPACE__ . NAMESPACE_SEPARATOR . 'Object');
