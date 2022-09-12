@@ -5,18 +5,42 @@ declare(strict_types=1);
 namespace NGSOFT\Pythonic\Attributes;
 
 use NGSOFT\Pythonic\Utils\Reflection,
+    ReflectionAttribute,
+    ReflectionClass,
+    ReflectionClassConstant,
+    ReflectionFunction,
+    ReflectionMethod,
+    ReflectionParameter,
+    ReflectionProperty,
     Throwable;
 
 abstract class Reader
 {
+
+    protected static function getInstance(
+            ReflectionAttribute $reflector,
+            ReflectionClass|ReflectionFunction|ReflectionMethod|ReflectionParameter|ReflectionProperty|ReflectionClassConstant $container
+    ): object
+    {
+
+        $class = $reflector->getName();
+
+        if (is_subclass_of($class, BaseAttribute::class, true))
+        {
+
+            return $class::fromReflectionAttribute($reflector, $container);
+        }
+
+        return $reflector->newInstance();
+    }
 
     /**
      * Returns the first named class attribute
      */
     public static function getClassAttribute(string|object $class, string $attribute): ?object
     {
-        /** @var \ReflectionClass $reflectionClass */
-        /** @var \ReflectionAttribute $reflectionAttribute */
+        /** @var ReflectionClass $reflectionClass */
+        /** @var ReflectionAttribute $reflectionAttribute */
         foreach (Reflection::getSubClasses($class) as $reflectionClass)
         {
 
@@ -26,7 +50,7 @@ abstract class Reader
                 {
                     try
                     {
-                        return $reflectionAttribute->newInstance();
+                        return self::getInstance($reflectionAttribute, $reflectionClass);
                     }
                     catch (Throwable)
                     {
@@ -47,7 +71,7 @@ abstract class Reader
 
         $reflector = Reflection::getMethod($class, $method);
 
-        /** @var \ReflectionAttribute $reflectionAttribute */
+        /** @var ReflectionAttribute $reflectionAttribute */
         foreach ($reflector->getAttributes() as $reflectionAttribute)
         {
 
@@ -56,7 +80,7 @@ abstract class Reader
 
                 try
                 {
-                    return $reflectionAttribute->newInstance();
+                    return self::getInstance($reflectionAttribute, $reflector);
                 }
                 catch (Throwable)
                 {
@@ -79,8 +103,8 @@ abstract class Reader
 
         $methods = [];
 
-        /** @var \ReflectionMethod $reflectionMethod */
-        /** @var \ReflectionAttribute $reflectionAttribute */
+        /** @var ReflectionMethod $reflectionMethod */
+        /** @var ReflectionAttribute $reflectionAttribute */
         foreach (Reflection::getMethods($class) as $reflectionMethod)
         {
 
@@ -99,7 +123,7 @@ abstract class Reader
 
                     try
                     {
-                        $methods[$method] = $reflectionAttribute->newInstance();
+                        $methods[$method] = self::getInstance($reflectionAttribute, $reflectionMethod);
                         break;
                     }
                     catch (Throwable)
@@ -122,7 +146,7 @@ abstract class Reader
 
         $reflector = Reflection::getProperty($class, $property);
 
-        /** @var \ReflectionAttribute $reflectionAttribute */
+        /** @var ReflectionAttribute $reflectionAttribute */
         foreach ($reflector->getAttributes() as $reflectionAttribute)
         {
 
@@ -131,7 +155,7 @@ abstract class Reader
 
                 try
                 {
-                    return $reflectionAttribute->newInstance();
+                    return self::getInstance($reflectionAttribute, $reflector);
                 }
                 catch (Throwable)
                 {
@@ -153,8 +177,8 @@ abstract class Reader
 
         $properties = [];
 
-        /** @var \ReflectionProperty $reflectionProperty */
-        /** @var \ReflectionAttribute $reflectionAttribute */
+        /** @var ReflectionProperty $reflectionProperty */
+        /** @var ReflectionAttribute $reflectionAttribute */
         foreach (Reflection::getProperties($class) as $reflectionProperty)
         {
 
@@ -172,7 +196,7 @@ abstract class Reader
                 {
                     try
                     {
-                        $properties[$property] = $reflectionAttribute->newInstance();
+                        $properties[$property] = self::getInstance($reflectionAttribute, $reflectionProperty);
                         break;
                     }
                     catch (Throwable)
