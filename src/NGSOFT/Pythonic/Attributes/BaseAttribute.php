@@ -8,7 +8,6 @@ use ReflectionAttribute,
     ReflectionClass,
     ReflectionClassConstant,
     ReflectionFunction,
-    ReflectionFunctionAbstract,
     ReflectionMethod,
     ReflectionParameter,
     ReflectionProperty;
