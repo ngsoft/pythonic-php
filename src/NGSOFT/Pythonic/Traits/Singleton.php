@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\Pythonic\Traits;
 
 use Pythonic\Errors\{
-    NotImplementedError, RuntimeError
+    AttributeError, RuntimeError
 };
 
 /**
@@ -57,7 +57,7 @@ trait Singleton
     {
         if ( ! method_exists($self, $method))
         {
-            return NotImplementedError::raise('%s::%s() is not implemented.', static::class, $method, previous: $prev);
+            AttributeError::raiseForClassAttribute(get_class($self), $method);
         }
         return $self->{$method}(...$arguments);
     }
