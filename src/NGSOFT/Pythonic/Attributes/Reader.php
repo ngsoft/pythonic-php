@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\Pythonic\Attributes;
 
-use Throwable;
+use NGSOFT\Pythonic\Utils\Reflection,
+    Throwable;
 
 abstract class Reader
 {

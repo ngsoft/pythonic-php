@@ -10,20 +10,11 @@ use Pythonic\{
 use function get_debug_type;
 
 /**
- * Replaces the python from keyword
- * usage $resource = from('namespace.subnamespace')->import('name')
+ * Pass
  */
-function from(string $namespace): Importer
+function pass()
 {
-    return Importer::from($namespace);
-}
-
-/**
- * imports resource(s) that can be a function name or class name
- */
-function import(string|array $resource, &$as = null, ?string $from = null): string|array
-{
-    return Importer::import($resource, $as, $from);
+    return;
 }
 
 /**
@@ -139,13 +130,3 @@ function is_dunder(mixed $value): bool
             mb_substr($value, 2, 1) !== '_' &&
             mb_substr($value, -3, 1) !== '_';
 }
-
-/**
- * Pass
- */
-function pass()
-{
-    return;
-}
-
-class_alias(__Object__::class, __NAMESPACE__ . NAMESPACE_SEPARATOR . 'Object');

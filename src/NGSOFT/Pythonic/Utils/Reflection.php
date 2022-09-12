@@ -73,8 +73,6 @@ abstract class Reflection
 
         if ( ! $result)
         {
-
-            $parent = $class;
             while (false !== $class)
             {
                 $result[$class] = static::getClass($class);
