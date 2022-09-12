@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Pythonic;
 
+use NGSOFT\Pythonic\Utils\{
+    StrUtils, Utils
+};
 use Pythonic\{
-    Errors\TypeError, Typing\Types, Utils\Importer, Utils\StrUtils, Utils\Utils
+    Errors\TypeError, Typing\Types
 };
 use function get_debug_type;
 
@@ -23,7 +26,11 @@ function pass()
 function len(mixed $countable): int
 {
 
-    if (is_string($countable))
+    if (is_object($countable) && method_exists($countable, '__len__'))
+    {
+        return $countable->__len__();
+    }
+    elseif (is_string($countable))
     {
         return StrUtils::len($countable);
     }
