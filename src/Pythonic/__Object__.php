@@ -125,6 +125,12 @@ class __Object__
     {
         // property cache
         static $properties = [];
+
+        if ( ! isset($properties[static::class]))
+        {
+
+            $properties[static::class] = Property::of($this);
+        }
     }
 
     public function __call(string $name, array $arguments): mixed
