@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\Pythonic\Traits;
 
-use NGSOFT\Pythonic\Utils\StrUtils;
 use Pythonic\Errors\{
     NotImplementedError, RuntimeError
 };
-use ReflectionException,
-    ReflectionMethod;
-use function Pythonic\is_dunder;
 
 /**
  * Use Singleton/Facade antipattern to call instances methods statically
@@ -59,15 +55,11 @@ trait Singleton
 
     protected static function executeMethod(object $self, string $method, array $arguments): mixed
     {
-
-        try
-        {
-            return (new ReflectionMethod($self, $method))->invokeArgs($self, $arguments);
-        }
-        catch (ReflectionException $prev)
+        if ( ! method_exists($self, $method))
         {
             return NotImplementedError::raise('%s::%s() is not implemented.', static::class, $method, previous: $prev);
         }
+        return $self->{$method}(...$arguments);
     }
 
     /**
@@ -76,7 +68,7 @@ trait Singleton
     public static function __callStatic(string $name, array $arguments): mixed
     {
         // call $class::__method__ as $class::instance()->method()
-        return static::executeMethod(static::instance(), is_dunder($name) ? StrUtils::slice($name, 2, -2) : $name, $arguments);
+        return static::executeMethod(static::instance(), $name, $arguments);
     }
 
 }
