@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace NGSOFT\Pythonic\Enums;
 
+use NGSOFT\Pythonic\Traits\NotInstanciable;
+
 class PHP
 {
 
-    use \Pythonic\Traits\NotInstanciable;
+    use NotInstanciable;
 
     /**
      * @link https://www.php.net/manual/en/language.oop5.magic.php

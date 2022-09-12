@@ -37,6 +37,7 @@ return [
     "exclude_analysis_directory_list" => [
         'stubs/',
         'vendor/',
+        'src/Pythonic'
     ],
     // A list of plugin files to execute.
     // See https://github.com/phan/phan/tree/master/.phan/plugins for even more.

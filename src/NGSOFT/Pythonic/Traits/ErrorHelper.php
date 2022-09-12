@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\Pythonic\Traits;
 
-use Pythonic\Utils\Utils,
+use NGSOFT\Pythonic\Utils\Utils,
     Throwable;
 
 trait ErrorHelper
