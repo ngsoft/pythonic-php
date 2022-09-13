@@ -51,7 +51,7 @@ class AttributeInfo
         }
         else
         {
-            TypeError::raise('Invalid attribute %s', $name);
+            TypeError::raise('Invalid php attribute %s', $name);
         }
     }
 
