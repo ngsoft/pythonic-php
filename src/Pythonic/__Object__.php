@@ -7,11 +7,13 @@ namespace Pythonic;
 use Closure,
     ErrorException;
 use NGSOFT\Pythonic\{
-    Traits\ClassUtils, Utils\Utils
+    Enums\PHP, Traits\ClassUtils, Utils\Reflection, Utils\Utils
 };
 use Pythonic\{
     Errors\AttributeError, Errors\TypeError, Typing\Types
 };
+use ReflectionMethod,
+    ReflectionProperty;
 
 /**
  * The Base pythonic object
@@ -114,6 +116,43 @@ class __Object__
         {
             unset($this->__dict__[$name]);
         }
+    }
+
+    protected function __dir__()
+    {
+
+        static $ignore;
+
+        $ignore ??= PHP::getBuiltinMethods();
+
+        $dict = array_keys($this->__dict__);
+
+        $attributes = ['__dict__' => '__dict__'] + array_combine($dict, $dict);
+
+        /** @var ReflectionMethod|ReflectionProperty $reflector */
+        foreach (Reflection::getMethods($this) + Reflection::getProperties($this) as $attr => $reflector)
+        {
+
+            if ($reflector->isStatic() || ! $reflector->isPublic())
+            {
+                continue;
+            }
+
+            if (isset($ignore[$attr]))
+            {
+                continue;
+            }
+
+
+            var_dump([$attr => $reflector]);
+        }
+
+
+
+
+
+
+        return array_values($attributes);
     }
 
     ////////////////////////////   PHP Magics   ////////////////////////////

@@ -19,4 +19,12 @@ enum TargetType: int
     case TARGET_CLASS_CONSTANT = Attribute::TARGET_CLASS_CONSTANT;
     case TARGET_PARAMETER = Attribute::TARGET_PARAMETER;
 
+    /**
+     * Get target from bitmask
+     */
+    public static function getTargets(int $flags): array
+    {
+        return array_filter(static::cases(), fn($enum) => ($flags & $enum->value) > 0);
+    }
+
 }

@@ -17,6 +17,9 @@ use NGSOFT\Pythonic\Utils\Reflection,
 abstract class Reader
 {
 
+    /**
+     * Attribute instanciator
+     */
     protected static function getInstance(
             ReflectionAttribute $reflector,
             ReflectionClass|ReflectionFunction|ReflectionMethod|ReflectionParameter|ReflectionProperty|ReflectionClassConstant $container
@@ -39,26 +42,36 @@ abstract class Reader
      */
     public static function getClassAttribute(string|object $class, string $attribute): ?object
     {
-        /** @var ReflectionClass $reflectionClass */
-        /** @var ReflectionAttribute $reflectionAttribute */
-        foreach (Reflection::getSubClasses($class) as $reflectionClass)
+
+        try
         {
-
-            foreach ($reflectionClass->getAttributes() as $reflectionAttribute)
+            /** @var ReflectionClass $reflectionClass */
+            /** @var ReflectionAttribute $reflectionAttribute */
+            foreach (Reflection::getSubClasses($class) as $reflectionClass)
             {
-                if ($reflectionAttribute->getName() === $attribute)
-                {
-                    try
-                    {
-                        return self::getInstance($reflectionAttribute, $reflectionClass);
-                    }
-                    catch (Throwable)
-                    {
 
+                foreach ($reflectionClass->getAttributes() as $reflectionAttribute)
+                {
+                    if ($reflectionAttribute->getName() === $attribute)
+                    {
+                        try
+                        {
+                            return self::getInstance($reflectionAttribute, $reflectionClass);
+                        }
+                        catch (Throwable)
+                        {
+
+                        }
                     }
                 }
             }
         }
+        catch (\Throwable)
+        {
+
+        }
+
+
 
         return null;
     }
@@ -69,25 +82,36 @@ abstract class Reader
     public static function getMethodAttribute(string|object $class, string $method, string $attribute): ?object
     {
 
-        $reflector = Reflection::getMethod($class, $method);
-
-        /** @var ReflectionAttribute $reflectionAttribute */
-        foreach ($reflector->getAttributes() as $reflectionAttribute)
+        try
         {
+            $reflector = Reflection::getMethod($class, $method);
 
-            if ($reflectionAttribute->getName() === $attribute)
+            /** @var ReflectionAttribute $reflectionAttribute */
+            foreach ($reflector->getAttributes() as $reflectionAttribute)
             {
 
-                try
-                {
-                    return self::getInstance($reflectionAttribute, $reflector);
-                }
-                catch (Throwable)
+                if ($reflectionAttribute->getName() === $attribute)
                 {
 
+                    try
+                    {
+                        return self::getInstance($reflectionAttribute, $reflector);
+                    }
+                    catch (Throwable)
+                    {
+
+                    }
                 }
             }
         }
+        catch (\Throwable)
+        {
+
+        }
+
+
+
+
 
 
         return null;
@@ -103,37 +127,43 @@ abstract class Reader
 
         $methods = [];
 
-        /** @var ReflectionMethod $reflectionMethod */
-        /** @var ReflectionAttribute $reflectionAttribute */
-        foreach (Reflection::getMethods($class) as $reflectionMethod)
+        try
         {
-
-
-            $method = $reflectionMethod->getName();
-            if (isset($methods[$method]))
-            {
-                continue;
-            }
-
-            foreach ($reflectionMethod->getAttributes() as $reflectionAttribute)
+            /** @var ReflectionMethod $reflectionMethod */
+            /** @var ReflectionAttribute $reflectionAttribute */
+            foreach (Reflection::getMethods($class) as $reflectionMethod)
             {
 
-                if ($reflectionAttribute->getName() === $attribute)
+
+                $method = $reflectionMethod->getName();
+                if (isset($methods[$method]))
+                {
+                    continue;
+                }
+
+                foreach ($reflectionMethod->getAttributes() as $reflectionAttribute)
                 {
 
-                    try
-                    {
-                        $methods[$method] = self::getInstance($reflectionAttribute, $reflectionMethod);
-                        break;
-                    }
-                    catch (Throwable)
+                    if ($reflectionAttribute->getName() === $attribute)
                     {
 
+                        try
+                        {
+                            $methods[$method] = self::getInstance($reflectionAttribute, $reflectionMethod);
+                            break;
+                        }
+                        catch (Throwable)
+                        {
+
+                        }
                     }
                 }
             }
         }
+        catch (\Throwable)
+        {
 
+        }
 
         return $methods;
     }
@@ -144,25 +174,35 @@ abstract class Reader
     public static function getPropertyAttribute(string|object $class, string $property, string $attribute): ?object
     {
 
-        $reflector = Reflection::getProperty($class, $property);
 
-        /** @var ReflectionAttribute $reflectionAttribute */
-        foreach ($reflector->getAttributes() as $reflectionAttribute)
+
+        try
         {
+            $reflector = Reflection::getProperty($class, $property);
 
-            if ($reflectionAttribute->getName() === $attribute)
+            /** @var ReflectionAttribute $reflectionAttribute */
+            foreach ($reflector->getAttributes() as $reflectionAttribute)
             {
 
-                try
-                {
-                    return self::getInstance($reflectionAttribute, $reflector);
-                }
-                catch (Throwable)
+                if ($reflectionAttribute->getName() === $attribute)
                 {
 
+                    try
+                    {
+                        return self::getInstance($reflectionAttribute, $reflector);
+                    }
+                    catch (Throwable)
+                    {
+
+                    }
                 }
             }
         }
+        catch (\Throwable)
+        {
+
+        }
+
 
 
         return null;
@@ -177,38 +217,88 @@ abstract class Reader
 
         $properties = [];
 
-        /** @var ReflectionProperty $reflectionProperty */
-        /** @var ReflectionAttribute $reflectionAttribute */
-        foreach (Reflection::getProperties($class) as $reflectionProperty)
+        try
         {
 
 
-            $property = $reflectionProperty->getName();
-            if (isset($properties[$property]))
-            {
-                continue;
-            }
-
-            foreach ($reflectionProperty->getAttributes() as $reflectionAttribute)
+            /** @var ReflectionProperty $reflectionProperty */
+            /** @var ReflectionAttribute $reflectionAttribute */
+            foreach (Reflection::getProperties($class) as $reflectionProperty)
             {
 
-                if ($reflectionAttribute->getName() === $attribute)
+
+                $property = $reflectionProperty->getName();
+                if (isset($properties[$property]))
                 {
-                    try
-                    {
-                        $properties[$property] = self::getInstance($reflectionAttribute, $reflectionProperty);
-                        break;
-                    }
-                    catch (Throwable)
-                    {
+                    continue;
+                }
 
+                foreach ($reflectionProperty->getAttributes() as $reflectionAttribute)
+                {
+
+                    if ($reflectionAttribute->getName() === $attribute)
+                    {
+                        try
+                        {
+                            $properties[$property] = self::getInstance($reflectionAttribute, $reflectionProperty);
+                            break;
+                        }
+                        catch (Throwable)
+                        {
+
+                        }
                     }
                 }
             }
         }
+        catch (\Throwable)
+        {
+
+        }
+
 
 
         return $properties;
+    }
+
+    /**
+     * Checks if class is attribute
+     */
+    public static function isAttribute(string|object $class): bool
+    {
+
+
+        if (is_object($class))
+        {
+            $class = get_class($class);
+        }
+
+        if ( ! class_exists($class))
+        {
+            return false;
+        }
+
+
+        if (static::getClassAttribute($class, \Attribute::class))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get attribute metadata
+     */
+    public static function getAttributeInfos(string|object $attribute): AttributeInfo
+    {
+
+        if ($attribute instanceof \ReflectionAttribute)
+        {
+            $attribute = $attribute->getName();
+        }
+
+        return AttributeInfo::of($attribute);
     }
 
 }
