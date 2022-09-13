@@ -65,9 +65,9 @@ class Property extends BaseAttribute
      * @param string|null $name property name
      */
     public function __construct(
-            string|Closure|null $fget = null,
-            string|Closure|null $fset = null,
-            string|Closure|null $fdel = null,
+            string|null $fget = null,
+            string|null $fset = null,
+            string|null $fdel = null,
             protected ?string $name = null
     )
     {
