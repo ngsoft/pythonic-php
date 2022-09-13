@@ -46,6 +46,9 @@ abstract class BaseAttribute
         return $instance;
     }
 
+    /**
+     * @phan-suppress PhanRedundantCondition
+     */
     public function __serialize(): array
     {
 
@@ -66,9 +69,10 @@ abstract class BaseAttribute
     {
         [$container, $this->target] = $data;
 
-        $class = array_shift($container);
-
-        $this->container = new $class(...$container);
+        if ($class = array_shift($container))
+        {
+            $this->container = new $class(...$container);
+        }
     }
 
 }

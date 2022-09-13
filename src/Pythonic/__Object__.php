@@ -182,7 +182,7 @@ class __Object__
             // not static __method__ for getter (faster than reflection)
             if (is_dunder($method) && ! is_callable(sprintf('%s::%s', static::class, $method)))
             {
-                // Closure or not ?
+                // not using Closure to make serialization possible
                 $this->__dict__[$method] ??= [$this, $method];
             }
         }
@@ -274,17 +274,13 @@ class __Object__
 
     public function __serialize(): array
     {
-        return get_object_vars($this);
+        return [$this->__dict__];
     }
 
     public function __unserialize(array $data): void
     {
 
-        foreach ($data as $prop => $value)
-        {
-
-            $this->{$prop} = $value;
-        }
+        [$this->__dict__] = $data;
     }
 
 }
