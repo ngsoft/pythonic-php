@@ -199,7 +199,7 @@ class __Object__
     /**
      * ==
      */
-    protected function __eq__($other)
+    protected function __eq__($other): bool
     {
 
         if ($other === $this)
