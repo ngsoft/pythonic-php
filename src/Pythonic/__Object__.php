@@ -7,16 +7,15 @@ namespace Pythonic;
 use Closure,
     ErrorException;
 use NGSOFT\Pythonic\{
-    Attributes\Reader, Enums\PHP, Traits\ClassUtils, Utils\Reflection, Utils\Utils
+    Enums\PHP, Traits\ClassUtils, Utils\Reflection, Utils\Utils
 };
 use Pythonic\{
     Errors\AttributeError, Errors\TypeError, Typing\Types
 };
-use ReflectionMethod,
-    ReflectionProperty;
 
 /**
  * The Base pythonic object
+ * Unlike python object it does not implements __init__, __init_subclass__, __module__, __new__, __repr__, __subclasshook__, __weakref__, __reduce__ , __reduce_ex__
  */
 class __Object__
 {
@@ -32,7 +31,7 @@ class __Object__
     #[Property]
     protected function __class__(): string
     {
-        return static::classname();
+        return static::class();
     }
 
     protected function __getattribute__(string $name): mixed
@@ -126,7 +125,7 @@ class __Object__
 
         $attributes = ['__dict__' => '__dict__'] + array_combine($dict, $dict);
 
-        /** @var ReflectionMethod|ReflectionProperty $reflector */
+        /** @var \ReflectionMethod|\ReflectionProperty $reflector */
         foreach (Reflection::getMethods($this) + Reflection::getProperties($this) as $attr => $reflector)
         {
 
@@ -271,6 +270,17 @@ class __Object__
     public function __unset(string $name): void
     {
         $this->__delattr__($name);
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->__dict__];
+    }
+
+    public function __unserialize(array $data): void
+    {
+
+        [$this->__dict__] = $data;
     }
 
 }
