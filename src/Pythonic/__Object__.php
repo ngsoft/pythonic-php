@@ -12,12 +12,12 @@ use NGSOFT\Pythonic\{
 use Pythonic\{
     Errors\AttributeError, Errors\NotImplementedError, Errors\TypeError, Typing\Types
 };
-use ReflectionMethod,
-    ReflectionProperty;
 
 /**
  * The Base pythonic object
  * Unlike python object it does not implements __init__, __init_subclass__, __module__, __new__, __subclasshook__, __weakref__, __reduce__ , __reduce_ex__, __format__
+ *
+ * @phan-file-suppress PhanUnusedProtectedNoOverrideMethodParameter
  */
 class __Object__
 {
@@ -78,6 +78,8 @@ class __Object__
         }
 
 
+        // WARNING ! can make class unserializable
+        // better add a method
         if ($value instanceof Closure)
         {
 
@@ -129,6 +131,9 @@ class __Object__
         }
     }
 
+    /**
+     * Get all public/dynamic methods and properties
+     */
     protected function __dir__(): array
     {
 
@@ -137,7 +142,7 @@ class __Object__
 
         $attributes = ['__dict__' => '__dict__'] + array_combine($dict, $dict);
 
-        /** @var ReflectionMethod|ReflectionProperty $reflector */
+        /** @var \ReflectionMethod|\ReflectionProperty $reflector */
         foreach (Reflection::getMethods($this) + Reflection::getProperties($this) as $attr => $reflector)
         {
 
@@ -159,26 +164,41 @@ class __Object__
         return array_values($attributes);
     }
 
+    /**
+     * >=
+     */
     protected function __ge__($other): bool
     {
         throw NotImplementedError::forMethod($this, __FUNCTION__);
     }
 
+    /**
+     * >
+     */
     protected function __gt__($other): bool
     {
         throw NotImplementedError::forMethod($this, __FUNCTION__);
     }
 
+    /**
+     * <=
+     */
     protected function __le__($other): bool
     {
         throw NotImplementedError::forMethod($this, __FUNCTION__);
     }
 
+    /**
+     * <
+     */
     protected function __lt__($other): bool
     {
         throw NotImplementedError::forMethod($this, __FUNCTION__);
     }
 
+    /**
+     * ==
+     */
     protected function __eq__($other)
     {
 
@@ -190,6 +210,9 @@ class __Object__
         throw NotImplementedError::forMethod($this, __FUNCTION__);
     }
 
+    /**
+     * !=
+     */
     protected function __ne__($other): bool
     {
         return ! $this->__eq__($other);
@@ -322,13 +345,15 @@ class __Object__
 
     public function __serialize(): array
     {
-        return [$this->__dict__];
+        return get_object_vars($this);
     }
 
     public function __unserialize(array $data): void
     {
-
-        [$this->__dict__] = $data;
+        foreach ($data as $prop => $value)
+        {
+            $this->{$prop} = $value;
+        }
     }
 
 }
