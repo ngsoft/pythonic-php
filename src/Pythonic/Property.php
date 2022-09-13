@@ -66,6 +66,7 @@ class Property extends BaseAttribute
             protected ?string $name = null
     )
     {
+        // setting as closures to prevent infinite loops for properties named the same as methods
         $fget && $this->getter($fget);
         $fset && $this->setter($fset);
         $fdel && $this->deleter($fdel);
