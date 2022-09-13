@@ -32,4 +32,15 @@ class Target implements \Stringable
         return $this->type->name;
     }
 
+    public function __serialize(): array
+    {
+        return [$this->target];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->target] = $data;
+        $this->type = TargetType::from($this->target);
+    }
+
 }

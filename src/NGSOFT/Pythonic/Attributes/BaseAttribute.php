@@ -46,4 +46,29 @@ abstract class BaseAttribute
         return $instance;
     }
 
+    public function __serialize(): array
+    {
+
+        $container = [
+            get_class($this->container)
+        ];
+
+        if (isset($this->container->class))
+        {
+            $container[] = $this->container->class;
+        }
+        $container[] = $container->name;
+
+        return [$container, $this->target];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$container, $this->target] = $data;
+
+        $class = array_shift($container);
+
+        $this->container = new $class(...$container);
+    }
+
 }

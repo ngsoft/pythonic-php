@@ -274,13 +274,17 @@ class __Object__
 
     public function __serialize(): array
     {
-        return [$this->__dict__];
+        return get_object_vars($this);
     }
 
     public function __unserialize(array $data): void
     {
 
-        [$this->__dict__] = $data;
+        foreach ($data as $prop => $value)
+        {
+
+            $this->{$prop} = $value;
+        }
     }
 
 }

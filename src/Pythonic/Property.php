@@ -196,4 +196,25 @@ class Property extends BaseAttribute
         call_user_func($this->getCallable($obj, $this->fdel));
     }
 
+    public function __serialize(): array
+    {
+
+        return [
+            $this->name,
+            $this->fget,
+            $this->fset,
+            $this->fdel,
+            parent::__serialize()
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+
+
+        [$this->name, $this->fget, $this->fset, $this->fdel, $parent] = $data;
+
+        parent::__unserialize($parent);
+    }
+
 }
