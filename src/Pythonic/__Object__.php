@@ -122,7 +122,13 @@ class __Object__
     public function __construct()
     {
 
-        $this->__dict__ = Property::of($this);
+
+        // properties cache
+        static $properties = [];
+
+        $properties[static::class] = Property::of($this);
+
+        $this->__dict__ = $properties[static::class];
 
         // initialize slots
         foreach ($this->__slots__ ?? [] as $slot)
@@ -146,6 +152,7 @@ class __Object__
             // not static __method__ for getter (faster than reflection)
             if (is_dunder($method) && ! is_callable(sprintf('%s::%s', static::class, $method)))
             {
+                // Closure or not ?
                 $this->__dict__[$method] ??= [$this, $method];
             }
         }
@@ -215,7 +222,14 @@ class __Object__
     public function __isset(string $name): bool
     {
 
-        return $this->hasAttr($name);
+        try
+        {
+            return $this->__getattribute__($name) !== null;
+        }
+        catch (AttributeError)
+        {
+            return false;
+        }
     }
 
     public function __set(string $name, mixed $value): void
