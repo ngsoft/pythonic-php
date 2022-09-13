@@ -30,7 +30,7 @@ class __Object__
     #[Property]
     protected function __class__(): string
     {
-        return static::class;
+        return static::classname();
     }
 
     protected function __getattribute__(string $name): mixed
