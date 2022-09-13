@@ -121,9 +121,6 @@ class __Object__
     protected function __dir__()
     {
 
-        static $ignore;
-
-        $ignore ??= PHP::getBuiltinMethods();
 
         $dict = array_keys($this->__dict__);
 
@@ -138,27 +135,21 @@ class __Object__
                 continue;
             }
 
-            $attr = $reflector->getName();
 
-            var_dump([$attr => Reader::hasAttribute(IsPythonic::class, $this, $attr)]);
-
-            if (isset($ignore[$attr]) && ! Reader::hasAttribute(IsPythonic::class, $this, $attr))
+            if (in_array($attr, PHP::MAGIC_METHODS))
             {
                 continue;
             }
+
+
+            $attributes[$attr] = $attr;
         }
-
-
-
-
-
 
         return array_values($attributes);
     }
 
     ////////////////////////////   PHP Magics   ////////////////////////////
 
-    #[IsPythonic]
     public function __construct()
     {
 
