@@ -57,7 +57,7 @@ abstract class BaseAttribute
         {
             $container[] = $this->container->class;
         }
-        $container[] = $container->name;
+        $container[] = $this->container->name;
 
         return [$container, $this->target];
     }

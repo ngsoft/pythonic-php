@@ -210,10 +210,7 @@ class Property extends BaseAttribute
 
     public function __unserialize(array $data): void
     {
-
-
         [$this->name, $this->fget, $this->fset, $this->fdel, $parent] = $data;
-
         parent::__unserialize($parent);
     }
 
