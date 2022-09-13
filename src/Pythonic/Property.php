@@ -47,7 +47,11 @@ class Property extends BaseAttribute
         foreach (Reader::getMethodsAttributes($class, __CLASS__) as $attr)
         {
 
-            $attr->getter($attr->getName());
+            if ( ! $attr->fget)
+            {
+                $attr->getter($attr->getName());
+            }
+
             $instances[$attr->getName()] ??= $attr;
         }
 
