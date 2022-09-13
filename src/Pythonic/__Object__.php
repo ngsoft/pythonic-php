@@ -138,13 +138,14 @@ class __Object__
                 continue;
             }
 
+            $attr = $reflector->getName();
+
+            var_dump([$attr => Reader::hasAttribute(IsPythonic::class, $this, $attr)]);
+
             if (isset($ignore[$attr]) && ! Reader::hasAttribute(IsPythonic::class, $this, $attr))
             {
                 continue;
             }
-
-
-            var_dump([$attr => $reflector]);
         }
 
 

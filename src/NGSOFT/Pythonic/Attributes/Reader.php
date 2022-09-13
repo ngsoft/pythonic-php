@@ -307,11 +307,11 @@ abstract class Reader
         if ($methodOrProperty)
         {
 
-            if (property_exists($class, $methodOrProperty))
+            if (method_exists($class, $methodOrProperty))
             {
                 return static::getMethodAttribute($class, $methodOrProperty, $attribute);
             }
-            elseif (method_exists($class, $methodOrProperty))
+            elseif (property_exists($class, $methodOrProperty))
             {
                 return static::getPropertyAttribute($class, $methodOrProperty, $attribute);
             }
