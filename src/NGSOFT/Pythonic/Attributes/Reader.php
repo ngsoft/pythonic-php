@@ -14,6 +14,9 @@ use NGSOFT\Pythonic\Utils\Reflection,
     ReflectionProperty,
     Throwable;
 
+/**
+ * Reads PHP attributes for classes, methods and properties
+ */
 abstract class Reader
 {
 
