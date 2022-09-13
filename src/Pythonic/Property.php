@@ -166,10 +166,8 @@ class Property extends BaseAttribute
 
         if ( ! $this->fget)
         {
-            AttributeError::of('can\'t get attribute');
+            AttributeError::raiseForAttribute('can\'t get attribute');
         }
-
-
 
         return call_user_func($this->getCallable($obj, $this->fget));
     }
@@ -179,7 +177,7 @@ class Property extends BaseAttribute
 
         if ( ! $this->fset)
         {
-            AttributeError::of('can\'t set attribute');
+            AttributeError::raiseForAttribute('can\'t set attribute');
         }
 
 
@@ -191,7 +189,7 @@ class Property extends BaseAttribute
 
         if ( ! $this->fdel)
         {
-            AttributeError::of('can\'t delete attribute');
+            AttributeError::raiseForAttribute('can\'t delete attribute');
         }
 
         call_user_func($this->getCallable($obj, $this->fdel));
