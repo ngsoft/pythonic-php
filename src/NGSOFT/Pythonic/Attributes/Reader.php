@@ -268,17 +268,6 @@ abstract class Reader
     {
 
 
-        if (is_object($class))
-        {
-            $class = get_class($class);
-        }
-
-        if ( ! class_exists($class))
-        {
-            return false;
-        }
-
-
         if (static::getClassAttribute($class, \Attribute::class))
         {
             return true;
