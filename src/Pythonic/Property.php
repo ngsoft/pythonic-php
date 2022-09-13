@@ -24,6 +24,10 @@ use Pythonic\Errors\{
 class Property extends BaseAttribute
 {
 
+    protected Closure|null $fget = null;
+    protected Closure|null $fset = null;
+    protected Closure|null $fdel = null;
+
     /**
      * Scan for all attributes and return type for class and returns instances
      */
@@ -42,10 +46,9 @@ class Property extends BaseAttribute
         foreach (Reader::getMethodsAttributes($class, __CLASS__) as $attr)
         {
 
-            $attr->fget ??= $attr->getName();
+            $attr->getter($attr->getName());
             $instances[$attr->getName()] ??= $attr;
         }
-
 
         return $instances;
     }
@@ -57,13 +60,15 @@ class Property extends BaseAttribute
      * @param string|null $name property name
      */
     public function __construct(
-            protected string|Closure|null $fget = null,
-            protected string|Closure|null $fset = null,
-            protected string|Closure|null $fdel = null,
+            string|Closure|null $fget = null,
+            string|Closure|null $fset = null,
+            string|Closure|null $fdel = null,
             protected ?string $name = null
     )
     {
-
+        $fget && $this->getter($fget);
+        $fset && $this->setter($fset);
+        $fdel && $this->deleter($fdel);
     }
 
     public function getName(): string
@@ -73,48 +78,87 @@ class Property extends BaseAttribute
 
     public function getter(string|Closure $fget): static
     {
+
+        if (is_string($fget))
+        {
+            $fget = function () use ($fget)
+            {
+                if ( ! method_exists($this, $fget))
+                {
+                    TypeError::raise('object %s method %s is not accessible.', get_class($this), $fget);
+                }
+
+                return $this->{$fget}();
+            };
+        }
+
+
         $this->fget = $fget;
         return $this;
     }
 
     public function setter(string|Closure $fset): static
     {
+
+        if (is_string($fset))
+        {
+
+            $fset = function (mixed $value) use ($fset)
+            {
+                if ( ! method_exists($this, $fset))
+                {
+                    TypeError::raise('object %s method %s is not accessible.', get_class($this), $fset);
+                }
+
+                $this->{$fset}($value);
+            };
+        }
+
+
         $this->fset = $fset;
         return $this;
     }
 
     public function deleter(string|Closure $fdel): static
     {
+
+        if (is_string($fdel))
+        {
+            $fdel = function () use ($fdel)
+            {
+
+                if ( ! method_exists($this, $fdel))
+                {
+                    TypeError::raise('object %s method %s is not accessible.', get_class($this), $fdel);
+                }
+
+                $this->{$fdel}();
+            };
+        }
+
         $this->fdel = $fdel;
         return $this;
     }
 
-    protected function getCallable(object $obj, string|Closure $method): callable
+    /**
+     * Binds Closure to obj if possible
+     */
+    protected function getCallable(object $obj, Closure $method): callable
     {
 
-        if ($method instanceof Closure)
+        try
         {
-            try
-            {
-                Utils::errors_as_exception();
-                return $method->bindTo($obj, get_class($obj));
-            }
-            catch (ErrorException)
-            {
-                return $method;
-            }
-            finally
-            {
-                restore_error_handler();
-            }
+            Utils::errors_as_exception();
+            return $method->bindTo($obj, get_class($obj));
         }
-
-        if ( ! method_exists($obj, $method))
+        catch (ErrorException)
         {
-            TypeError::raise('object %s method %s is not accessible.', get_class($obj), $method);
+            return $method;
         }
-
-        return [$obj, $method];
+        finally
+        {
+            restore_error_handler();
+        }
     }
 
     public function __get__(object $obj): mixed
@@ -124,6 +168,8 @@ class Property extends BaseAttribute
         {
             AttributeError::of('can\'t get attribute');
         }
+
+
 
         return call_user_func($this->getCallable($obj, $this->fget));
     }
@@ -135,6 +181,7 @@ class Property extends BaseAttribute
         {
             AttributeError::of('can\'t set attribute');
         }
+
 
         call_user_func($this->getCallable($obj, $this->fset), $value);
     }

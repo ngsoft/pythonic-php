@@ -84,9 +84,8 @@ class __Object__
             }
         }
 
+        $prop = $this->__dict__[$name] ?? null;
 
-
-        $prop = $this->__dict__[$name];
         if ($prop instanceof Property)
         {
             $prop->__set__($this, $value);
@@ -123,13 +122,29 @@ class __Object__
 
     public function __construct()
     {
-        // property cache
-        static $properties = [];
 
-        if ( ! isset($properties[static::class]))
+        $this->__dict__ = Property::of($this);
+
+        // initialize slots
+        foreach ($this->__slots__ ?? [] as $slot)
         {
+            $this->__dict__[$slot] ??= null;
+        }
 
-            $properties[static::class] = Property::of($this);
+
+        if (null !== $this->__slots__)
+        {
+            $this->__dict__['__slots__'] = $this->__slots__;
+        }
+
+        // protected dunder methods
+        foreach (get_class_methods($this) as $method)
+        {
+            // not static __method__ for getter (faster than reflection)
+            if (is_dunder($method) && ! is_callable(sprintf('%s::%s', static::class, $method)))
+            {
+                $this->__dict__[$method] ??= [$this, $method];
+            }
         }
     }
 
@@ -142,7 +157,6 @@ class __Object__
         {
             TypeError::raise("'%s' object is not callable.", static::classname(Types::getType($attr)));
         }
-
 
         return $attr(...$arguments);
     }
