@@ -41,7 +41,6 @@ class __Object__
             return $this->__dict__;
         }
 
-
         if ( ! array_key_exists($name, $this->__dict__))
         {
             AttributeError::raiseForClassAttribute($this, $name);
@@ -128,6 +127,10 @@ class __Object__
         // initialize slots
         foreach ($this->__slots__ ?? [] as $slot)
         {
+            if ($slot === '__dict__')
+            {
+                continue;
+            }
             $this->__dict__[$slot] ??= null;
         }
 
@@ -137,7 +140,7 @@ class __Object__
             $this->__dict__['__slots__'] = $this->__slots__;
         }
 
-        // protected dunder methods
+        // protected dunder methods (for __call)
         foreach (get_class_methods($this) as $method)
         {
             // not static __method__ for getter (faster than reflection)
@@ -181,6 +184,11 @@ class __Object__
 
     protected function hasSlot(string $name): bool
     {
+
+        if ($name === '__dict__')
+        {
+            return false;
+        }
 
         if ( ! is_array($this->__slots__))
         {
