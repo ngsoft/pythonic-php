@@ -7,7 +7,7 @@ namespace Pythonic;
 use Closure,
     ErrorException;
 use NGSOFT\Pythonic\{
-    Enums\PHP, Traits\ClassUtils, Utils\Reflection, Utils\Utils
+    Attributes\Reader, Enums\PHP, Traits\ClassUtils, Utils\Reflection, Utils\Utils
 };
 use Pythonic\{
     Errors\AttributeError, Errors\TypeError, Typing\Types
@@ -138,7 +138,7 @@ class __Object__
                 continue;
             }
 
-            if (isset($ignore[$attr]))
+            if (isset($ignore[$attr]) && ! Reader::hasAttribute(IsPythonic::class, $this, $attr))
             {
                 continue;
             }
@@ -157,7 +157,7 @@ class __Object__
 
     ////////////////////////////   PHP Magics   ////////////////////////////
 
-
+    #[IsPythonic]
     public function __construct()
     {
 

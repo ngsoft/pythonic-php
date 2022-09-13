@@ -56,7 +56,7 @@ abstract class Reader
                     {
                         try
                         {
-                            return self::getInstance($reflectionAttribute, $reflectionClass);
+                            return static::getInstance($reflectionAttribute, $reflectionClass);
                         }
                         catch (Throwable)
                         {
@@ -95,7 +95,7 @@ abstract class Reader
 
                     try
                     {
-                        return self::getInstance($reflectionAttribute, $reflector);
+                        return static::getInstance($reflectionAttribute, $reflector);
                     }
                     catch (Throwable)
                     {
@@ -149,7 +149,7 @@ abstract class Reader
 
                         try
                         {
-                            $methods[$method] = self::getInstance($reflectionAttribute, $reflectionMethod);
+                            $methods[$method] = static::getInstance($reflectionAttribute, $reflectionMethod);
                             break;
                         }
                         catch (Throwable)
@@ -189,7 +189,7 @@ abstract class Reader
 
                     try
                     {
-                        return self::getInstance($reflectionAttribute, $reflector);
+                        return static::getInstance($reflectionAttribute, $reflector);
                     }
                     catch (Throwable)
                     {
@@ -240,7 +240,7 @@ abstract class Reader
                     {
                         try
                         {
-                            $properties[$property] = self::getInstance($reflectionAttribute, $reflectionProperty);
+                            $properties[$property] = static::getInstance($reflectionAttribute, $reflectionProperty);
                             break;
                         }
                         catch (Throwable)
@@ -285,6 +285,53 @@ abstract class Reader
         }
 
         return false;
+    }
+
+    /**
+     * get the first attribute for given resource
+     */
+    public static function getAttribute(
+            string $attribute,
+            string|object $class,
+            ?string $methodOrProperty = null
+    ): ?object
+    {
+
+
+        if ( ! is_string($class))
+        {
+            $class = get_class($class);
+        }
+
+
+        if ($methodOrProperty)
+        {
+
+            if (property_exists($class, $methodOrProperty))
+            {
+                return static::getMethodAttribute($class, $methodOrProperty, $attribute);
+            }
+            elseif (method_exists($class, $methodOrProperty))
+            {
+                return static::getPropertyAttribute($class, $methodOrProperty, $attribute);
+            }
+            return null;
+        }
+
+
+        return static::getClassAttribute($class, $attribute);
+    }
+
+    /**
+     * Checks if attribute exists
+     */
+    public static function hasAttribute(
+            string $attribute,
+            string|object $class,
+            ?string $methodOrProperty = null
+    ): bool
+    {
+        return static::getAttribute($attribute, $class, $methodOrProperty) !== null;
     }
 
     /**
