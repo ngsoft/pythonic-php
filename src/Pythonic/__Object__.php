@@ -38,7 +38,7 @@ class __Object__
 
     protected function __repr__(): string
     {
-        return sprintf('%s(%s)#%d', static::classname(__CLASS__), $this->__class__(), spl_object_id($this));
+        return sprintf('%s(%s)#%d', strtolower(static::classname(__CLASS__)), $this->__class__(), spl_object_id($this));
     }
 
     protected function __str__(): string
