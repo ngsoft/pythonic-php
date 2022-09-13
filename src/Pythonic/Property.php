@@ -24,9 +24,12 @@ use Pythonic\Errors\{
 class Property extends BaseAttribute
 {
 
-    protected Closure|null $fget = null;
-    protected Closure|null $fset = null;
-    protected Closure|null $fdel = null;
+    protected string|null $fget = null;
+    protected string|null $fset = null;
+    protected string|null $fdel = null;
+    protected ?Closure $getter = null;
+    protected ?Closure $setter = null;
+    protected ?Closure $deleter = null;
 
     /**
      * Scan for all attributes and return type for class and returns instances
@@ -80,8 +83,10 @@ class Property extends BaseAttribute
     public function getter(string|Closure $fget): static
     {
 
+        $this->fget = null;
         if (is_string($fget))
         {
+            $this->fget = $fget;
             $fget = function () use ($fget)
             {
                 if ( ! method_exists($this, $fget))
@@ -94,15 +99,19 @@ class Property extends BaseAttribute
         }
 
 
-        $this->fget = $fget;
+        $this->getter = $fget;
         return $this;
     }
 
     public function setter(string|Closure $fset): static
     {
 
+
+        $this->fset = null;
         if (is_string($fset))
         {
+
+            $this->fset = $fset;
 
             $fset = function (mixed $value) use ($fset)
             {
@@ -116,15 +125,19 @@ class Property extends BaseAttribute
         }
 
 
-        $this->fset = $fset;
+        $this->setter = $fset;
         return $this;
     }
 
     public function deleter(string|Closure $fdel): static
     {
 
+        $this->fdel = null;
+
         if (is_string($fdel))
         {
+            $this->fdel = $fdel;
+
             $fdel = function () use ($fdel)
             {
 
@@ -137,7 +150,7 @@ class Property extends BaseAttribute
             };
         }
 
-        $this->fdel = $fdel;
+        $this->deleter = $fdel;
         return $this;
     }
 
@@ -165,35 +178,35 @@ class Property extends BaseAttribute
     public function __get__(object $obj): mixed
     {
 
-        if ( ! $this->fget)
+        if ( ! $this->getter)
         {
             AttributeError::raiseForAttribute('can\'t get attribute');
         }
 
-        return call_user_func($this->getCallable($obj, $this->fget));
+        return call_user_func($this->getCallable($obj, $this->getter));
     }
 
     public function __set__(object $obj, mixed $value): void
     {
 
-        if ( ! $this->fset)
+        if ( ! $this->setter)
         {
             AttributeError::raiseForAttribute('can\'t set attribute');
         }
 
 
-        call_user_func($this->getCallable($obj, $this->fset), $value);
+        call_user_func($this->getCallable($obj, $this->setter), $value);
     }
 
     public function __delete__(object $obj): void
     {
 
-        if ( ! $this->fdel)
+        if ( ! $this->deleter)
         {
             AttributeError::raiseForAttribute('can\'t delete attribute');
         }
 
-        call_user_func($this->getCallable($obj, $this->fdel));
+        call_user_func($this->getCallable($obj, $this->deleter));
     }
 
     public function __serialize(): array
