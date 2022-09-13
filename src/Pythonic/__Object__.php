@@ -17,7 +17,7 @@ use ReflectionMethod,
 
 /**
  * The Base pythonic object
- * Unlike python object it does not implements __init__, __init_subclass__, __module__, __new__, __repr__, __subclasshook__, __weakref__, __reduce__ , __reduce_ex__
+ * Unlike python object it does not implements __init__, __init_subclass__, __module__, __new__, __subclasshook__, __weakref__, __reduce__ , __reduce_ex__, __format__
  */
 class __Object__
 {
@@ -36,9 +36,14 @@ class __Object__
         return static::class();
     }
 
+    protected function __repr__(): string
+    {
+        return sprintf('%s(%s)#%d', static::classname(__CLASS__), $this->__class__(), spl_object_id($this));
+    }
+
     protected function __str__(): string
     {
-        return sprintf('object(%s)#%d', $this->__class__(), spl_object_id($this));
+        return $this->__repr__();
     }
 
     protected function __getattribute__(string $name): mixed
@@ -156,15 +161,38 @@ class __Object__
 
     protected function __ge__($other): bool
     {
-
-
-
-        throw new NotImplementedError();
+        throw NotImplementedError::forMethod($this, __FUNCTION__);
     }
 
     protected function __gt__($other): bool
     {
-        throw new NotImplementedError();
+        throw NotImplementedError::forMethod($this, __FUNCTION__);
+    }
+
+    protected function __le__($other): bool
+    {
+        throw NotImplementedError::forMethod($this, __FUNCTION__);
+    }
+
+    protected function __lt__($other): bool
+    {
+        throw NotImplementedError::forMethod($this, __FUNCTION__);
+    }
+
+    protected function __eq__($other)
+    {
+
+        if ($other === $this)
+        {
+            return true;
+        }
+
+        throw NotImplementedError::forMethod($this, __FUNCTION__);
+    }
+
+    protected function __ne__($other): bool
+    {
+        return ! $this->__eq__($other);
     }
 
     ////////////////////////////   PHP Magics   ////////////////////////////
