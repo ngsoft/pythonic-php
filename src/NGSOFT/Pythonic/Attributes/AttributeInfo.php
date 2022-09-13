@@ -7,8 +7,7 @@ namespace NGSOFT\Pythonic\Attributes;
 use Attribute,
     NGSOFT\Pythonic\Utils\Reflection,
     Pythonic\Errors\TypeError,
-    ReflectionAttribute,
-    ReflectionParameter;
+    ReflectionAttribute;
 
 /**
  * The Infos about an Attribute
@@ -20,7 +19,7 @@ class AttributeInfo
     protected int $flags;
     protected bool $repeatable;
     protected array $targets;
-    protected $params = null;
+    protected ?array $params = null;
 
     /**
      * get infos for an attribute
@@ -43,15 +42,17 @@ class AttributeInfo
     )
     {
 
-        if ( ! Reader::isAttribute($name))
+        if ($attribute = Reader::getClassAttribute($name, Attribute::class))
+        {
+            $this->attribute = $attribute;
+            $flags = $this->flags = $this->attribute->flags;
+            $this->repeatable = ($flags & Attribute::IS_REPEATABLE) > 0;
+            $this->targets = TargetType::getTargets($flags);
+        }
+        else
         {
             TypeError::raise('Invalid attribute %s', $name);
         }
-
-        $this->attribute = Reader::getClassAttribute($name, Attribute::class);
-        $flags = $this->flags = $this->attribute->flags;
-        $this->repeatable = ($flags & Attribute::IS_REPEATABLE) > 0;
-        $this->targets = TargetType::getTargets($flags);
     }
 
     public function isRepeatable(): bool
@@ -91,8 +92,9 @@ class AttributeInfo
 
     /**
      * Get attribute parameters
+     * @return AttributeParameter[]
      */
-    public function getParams(): array
+    public function getParams()
     {
 
         if (null === $this->params)
@@ -104,7 +106,6 @@ class AttributeInfo
 
             if ($construct = $reflectClass->getConstructor())
             {
-                /** @var ReflectionParameter $param */
                 foreach ($construct->getParameters() as $param)
                 {
                     $instance = AttributeParameter::of($param);
