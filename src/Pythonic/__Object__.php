@@ -10,8 +10,10 @@ use NGSOFT\Pythonic\{
     Enums\PHP, Traits\ClassUtils, Utils\Reflection, Utils\Utils
 };
 use Pythonic\{
-    Errors\AttributeError, Errors\TypeError, Typing\Types
+    Errors\AttributeError, Errors\NotImplementedError, Errors\TypeError, Typing\Types
 };
+use ReflectionMethod,
+    ReflectionProperty;
 
 /**
  * The Base pythonic object
@@ -32,6 +34,11 @@ class __Object__
     protected function __class__(): string
     {
         return static::class();
+    }
+
+    protected function __str__(): string
+    {
+        return sprintf('object(%s)#%d', $this->__class__(), spl_object_id($this));
     }
 
     protected function __getattribute__(string $name): mixed
@@ -117,7 +124,7 @@ class __Object__
         }
     }
 
-    protected function __dir__()
+    protected function __dir__(): array
     {
 
 
@@ -125,7 +132,7 @@ class __Object__
 
         $attributes = ['__dict__' => '__dict__'] + array_combine($dict, $dict);
 
-        /** @var \ReflectionMethod|\ReflectionProperty $reflector */
+        /** @var ReflectionMethod|ReflectionProperty $reflector */
         foreach (Reflection::getMethods($this) + Reflection::getProperties($this) as $attr => $reflector)
         {
 
@@ -145,6 +152,19 @@ class __Object__
         }
 
         return array_values($attributes);
+    }
+
+    protected function __ge__($other): bool
+    {
+
+
+
+        throw new NotImplementedError();
+    }
+
+    protected function __gt__($other): bool
+    {
+        throw new NotImplementedError();
     }
 
     ////////////////////////////   PHP Magics   ////////////////////////////
