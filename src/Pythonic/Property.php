@@ -17,8 +17,6 @@ use Pythonic\Errors\{
 /**
  * The python property
  * use this as attribute to retain "@property"
- * this can also be used inside your constructor for protected or lower properties
- * eg: $this->prop = new Property('getProp', 'setProp')
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_METHOD)]
 class Property extends BaseAttribute
