@@ -41,3 +41,4 @@ define('ArrayType', 'array');
  * is_object($obj) !== isinstance($obj, object)
  */
 define('object', 'object');
+
